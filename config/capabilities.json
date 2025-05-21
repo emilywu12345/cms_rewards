@@ -1,0 +1,6 @@
+{
+    "browserName": "chrome",
+    "version": "",
+    "platform": "ANY",
+    "javascriptEnabled": true
+}

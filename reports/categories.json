@@ -1,0 +1,17 @@
+[
+  {
+    "name": "登录失败",
+    "matchedStatuses": ["failed"],
+    "messageRegex": ".*登录失败.*"
+  },
+  {
+    "name": "元素未找到",
+    "matchedStatuses": ["failed"],
+    "messageRegex": ".*NoSuchElement.*"
+  },
+  {
+    "name": "超时错误",
+    "matchedStatuses": ["failed"],
+    "messageRegex": ".*TimeoutException.*"
+  }
+]

@@ -1,0 +1,7 @@
+{
+    "Browser": "chrome",
+    "Browser.Version": "stable",
+    "Python.Version": "3.8",
+    "Stand": "QA",
+    "Test URL": "http://aiportal.temvo.com/login"
+}

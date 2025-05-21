@@ -1,0 +1,3 @@
+"Status","Start Time","Stop Time","Duration in ms","Parent Suite","Suite","Sub Suite","Test Class","Test Method","Name","Description"
+"broken","Tue May 20 20:21:39 CST 2025","Tue May 20 20:21:39 CST 2025","0","tests","test_knowledge_base","TestKnowledgeBase","","","test_edit_knowledge_base","验证用户能否成功编辑现有知识库"
+"broken","Tue May 20 20:21:29 CST 2025","Tue May 20 20:21:29 CST 2025","0","tests","test_knowledge_base","TestKnowledgeBase","","","test_create_knowledge_base","验证用户能否成功创建新的知识库"
