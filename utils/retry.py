@@ -1,6 +1,6 @@
 import time
 from functools import wraps
-from utils.logger import logger
+from utils.log_manager import logger
 
 def retry_on_failure(retries=3, delay=2):
     def decorator(func):

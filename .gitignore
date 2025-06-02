@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 虚拟环境
+venv/
+env/
+
+# 日志文件
+*.log
+logs/
+
+# 测试报告和截图
+reports/
+screenshots/
+
+# IDE 相关
+.idea/
+.vscode/
+
+# 其他
+*.pyc
+.DS_Store

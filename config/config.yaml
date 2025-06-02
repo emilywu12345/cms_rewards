@@ -1,0 +1,60 @@
+# Web UI 自动化测试配置文件
+
+# 环境配置
+environments:
+  qa:  # QA测试环境
+    url: "http://192.168.101.65"
+    username: "admin2@cn.ey.com"
+    password: "mtyTWgJlFOqHfNyIbKZR"
+    api_base_url: "http://192.168.101.65/api"  # API基础URL
+  timeout: 30  # 环境特定超时设置
+  uat:  # UAT测试环境
+    url: "https://aiportal.temvo.com/login"
+    username: "1062174229@qq.com"
+    password: "85516d29504949bc"
+    api_base_url: "https://aiportal.temvo.com/api"
+    timeout: 30
+
+# 浏览器配置
+browser:
+  type: "chrome"  # 支持 chrome, firefox, edge
+  headless: false  # 是否启用无头模式
+  implicit_wait: 10  # 隐式等待时间(秒)
+  page_load_timeout: 30  # 页面加载超时时间(秒)
+  script_timeout: 30  # 脚本执行超时时间(秒)
+  screenshot_on_failure: true  # 失败时是否自动截图
+  capabilities:
+    browserName: "chrome"
+    version: ""
+    platform: "ANY"
+    javascriptEnabled: true
+    args:  # 浏览器启动参数
+      - "--start-maximized"  # 最大化窗口
+      - "--disable-notifications"  # 禁用通知
+      - "--no-sandbox"  # 禁用沙箱
+      - "--disable-dev-shm-usage"  # 禁用共享内存
+      - "--disable-gpu"  # 禁用GPU加速
+    prefs:  # 浏览器首选项
+      "download.default_directory": "downloads"  # 下载目录
+      "profile.default_content_settings.popups": 0  # 禁用弹窗
+
+# 测试配置
+test:
+  retry_times: 3  # 失败重试次数
+  retry_interval: 2  # 重试间隔(秒)
+  parallel: false  # 是否并行执行测试
+  screenshot_dir: "screenshots"  # 截图保存目录
+  log_level: "INFO"  # 日志级别
+  wait:  # 等待时间配置
+    short: 5  # 短等待(秒)
+    medium: 10  # 中等等待(秒)
+    long: 30  # 长等待(秒)
+
+# 报告配置
+report:
+  allure_results_dir: "reports/allure_results"  # Allure结果目录
+  allure_report_dir: "reports/allure_report"  # Allure报告目录
+  html_report_dir: "reports/html_report"  # HTML报告目录
+  screenshot_dir: "reports/screenshots"  # 报告截图目录
+  clean_results: true  # 是否清理旧结果
+  attach_screenshot: true  # 是否在报告中附加截图

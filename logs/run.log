@@ -1,209 +1,100 @@
-2025-05-19 19:50:32 - INFO - 登入成功
-2025-05-19 19:50:32 - INFO - 登录流程已执行
-2025-05-19 19:50:43 - ERROR - 元素定位失败: ('class name', 'user-profile')
-2025-05-19 19:50:43 - WARNING - 重试 test_login 第 1 次, 错误: Message: 
-Stacktrace:
-	GetHandleVerifier [0x00007FF78D2BCF65+75717]
-	GetHandleVerifier [0x00007FF78D2BCFC0+75808]
-	(No symbol) [0x00007FF78D088F9A]
-	(No symbol) [0x00007FF78D0DF4C6]
-	(No symbol) [0x00007FF78D0DF77C]
-	(No symbol) [0x00007FF78D132577]
-	(No symbol) [0x00007FF78D1073BF]
-	(No symbol) [0x00007FF78D12F39C]
-	(No symbol) [0x00007FF78D107153]
-	(No symbol) [0x00007FF78D0D0421]
-	(No symbol) [0x00007FF78D0D11B3]
-	GetHandleVerifier [0x00007FF78D5BD74D+3223469]
-	GetHandleVerifier [0x00007FF78D5B7CF2+3200338]
-	GetHandleVerifier [0x00007FF78D5D5B23+3322755]
-	GetHandleVerifier [0x00007FF78D2D6A3A+180890]
-	GetHandleVerifier [0x00007FF78D2DE13F+211359]
-	GetHandleVerifier [0x00007FF78D2C52B4+109332]
-	GetHandleVerifier [0x00007FF78D2C5462+109762]
-	GetHandleVerifier [0x00007FF78D2ABA79+4825]
-	BaseThreadInitThunk [0x00007FFF298B259D+29]
-	RtlUserThreadStart [0x00007FFF2B00AF38+40]
-
-2025-05-19 19:51:15 - INFO - 登入成功
-2025-05-19 19:51:15 - INFO - 登录流程已执行
-2025-05-19 19:51:26 - ERROR - 元素定位失败: ('class name', 'user-profile')
-2025-05-19 19:51:26 - WARNING - 重试 test_login 第 1 次, 错误: Message: 
-Stacktrace:
-	GetHandleVerifier [0x00007FF78D2BCF65+75717]
-	GetHandleVerifier [0x00007FF78D2BCFC0+75808]
-	(No symbol) [0x00007FF78D088F9A]
-	(No symbol) [0x00007FF78D0DF4C6]
-	(No symbol) [0x00007FF78D0DF77C]
-	(No symbol) [0x00007FF78D132577]
-	(No symbol) [0x00007FF78D1073BF]
-	(No symbol) [0x00007FF78D12F39C]
-	(No symbol) [0x00007FF78D107153]
-	(No symbol) [0x00007FF78D0D0421]
-	(No symbol) [0x00007FF78D0D11B3]
-	GetHandleVerifier [0x00007FF78D5BD74D+3223469]
-	GetHandleVerifier [0x00007FF78D5B7CF2+3200338]
-	GetHandleVerifier [0x00007FF78D5D5B23+3322755]
-	GetHandleVerifier [0x00007FF78D2D6A3A+180890]
-	GetHandleVerifier [0x00007FF78D2DE13F+211359]
-	GetHandleVerifier [0x00007FF78D2C52B4+109332]
-	GetHandleVerifier [0x00007FF78D2C5462+109762]
-	GetHandleVerifier [0x00007FF78D2ABA79+4825]
-	BaseThreadInitThunk [0x00007FFF298B259D+29]
-	RtlUserThreadStart [0x00007FFF2B00AF38+40]
-
-2025-05-19 19:51:31 - INFO - 登入成功
-2025-05-19 19:51:31 - INFO - 登录流程已执行
-2025-05-19 19:51:41 - ERROR - 元素定位失败: ('class name', 'user-profile')
-2025-05-19 19:59:55 - INFO - 登入成功
-2025-05-19 19:59:55 - INFO - 登录流程已执行
-2025-05-19 19:59:58 - WARNING - 重试 test_login 第 1 次, 错误: Message: invalid session id: session deleted as the browser has closed the connection
-from disconnected: not connected to DevTools
+2025-06-01 19:10:45 - INFO - 开始登录流程
+2025-06-01 19:11:21 - ERROR - 登录过程发生异常: Message: no such window: target window already closed
+from unknown error: web view not found
   (Session info: chrome=136.0.7103.114)
 Stacktrace:
-	GetHandleVerifier [0x00007FF78D2BCF65+75717]
-	GetHandleVerifier [0x00007FF78D2BCFC0+75808]
-	(No symbol) [0x00007FF78D088F9A]
-	(No symbol) [0x00007FF78D074E35]
-	(No symbol) [0x00007FF78D099DB4]
-	(No symbol) [0x00007FF78D10EE75]
-	(No symbol) [0x00007FF78D12ECC2]
-	(No symbol) [0x00007FF78D107153]
-	(No symbol) [0x00007FF78D0D0421]
-	(No symbol) [0x00007FF78D0D11B3]
-	GetHandleVerifier [0x00007FF78D5BD74D+3223469]
-	GetHandleVerifier [0x00007FF78D5B7CF2+3200338]
-	GetHandleVerifier [0x00007FF78D5D5B23+3322755]
-	GetHandleVerifier [0x00007FF78D2D6A3A+180890]
-	GetHandleVerifier [0x00007FF78D2DE13F+211359]
-	GetHandleVerifier [0x00007FF78D2C52B4+109332]
-	GetHandleVerifier [0x00007FF78D2C5462+109762]
-	GetHandleVerifier [0x00007FF78D2ABA79+4825]
-	BaseThreadInitThunk [0x00007FFF298B259D+29]
-	RtlUserThreadStart [0x00007FFF2B00AF38+40]
+	GetHandleVerifier [0x00007FF6C0B8CF45+75717]
+	GetHandleVerifier [0x00007FF6C0B8CFA0+75808]
+	(No symbol) [0x00007FF6C0958F9A]
+	(No symbol) [0x00007FF6C0931B41]
+	(No symbol) [0x00007FF6C09DEC2E]
+	(No symbol) [0x00007FF6C09FECC2]
+	(No symbol) [0x00007FF6C09D7153]
+	(No symbol) [0x00007FF6C09A0421]
+	(No symbol) [0x00007FF6C09A11B3]
+	GetHandleVerifier [0x00007FF6C0E8D71D+3223453]
+	GetHandleVerifier [0x00007FF6C0E87CC2+3200322]
+	GetHandleVerifier [0x00007FF6C0EA5AF3+3322739]
+	GetHandleVerifier [0x00007FF6C0BA6A1A+180890]
+	GetHandleVerifier [0x00007FF6C0BAE11F+211359]
+	GetHandleVerifier [0x00007FF6C0B95294+109332]
+	GetHandleVerifier [0x00007FF6C0B95442+109762]
+	GetHandleVerifier [0x00007FF6C0B7BA59+4825]
+	BaseThreadInitThunk [0x00007FF90B7DE8D7+23]
+	RtlUserThreadStart [0x00007FF90C45C5DC+44]
 
-2025-05-20 18:58:06 - ERROR - 元素定位失败: ('xpath', '/html/body/div[1]/div/main/div[1]/div/div[1]/div/div')
-2025-05-20 18:58:07 - WARNING - 重试 test_login 第 1 次, 错误: Message: 
+2025-06-01 19:11:21 - ERROR - 截图失败: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=136.0.7103.114)
 Stacktrace:
-	GetHandleVerifier [0x00007FF7F2EBCF65+75717]
-	GetHandleVerifier [0x00007FF7F2EBCFC0+75808]
-	(No symbol) [0x00007FF7F2C88F9A]
-	(No symbol) [0x00007FF7F2CDF4C6]
-	(No symbol) [0x00007FF7F2CDF77C]
-	(No symbol) [0x00007FF7F2D32577]
-	(No symbol) [0x00007FF7F2D073BF]
-	(No symbol) [0x00007FF7F2D2F39C]
-	(No symbol) [0x00007FF7F2D07153]
-	(No symbol) [0x00007FF7F2CD0421]
-	(No symbol) [0x00007FF7F2CD11B3]
-	GetHandleVerifier [0x00007FF7F31BD74D+3223469]
-	GetHandleVerifier [0x00007FF7F31B7CF2+3200338]
-	GetHandleVerifier [0x00007FF7F31D5B23+3322755]
-	GetHandleVerifier [0x00007FF7F2ED6A3A+180890]
-	GetHandleVerifier [0x00007FF7F2EDE13F+211359]
-	GetHandleVerifier [0x00007FF7F2EC52B4+109332]
-	GetHandleVerifier [0x00007FF7F2EC5462+109762]
-	GetHandleVerifier [0x00007FF7F2EABA79+4825]
-	BaseThreadInitThunk [0x00007FFF298B259D+29]
-	RtlUserThreadStart [0x00007FFF2B00AF38+40]
+	GetHandleVerifier [0x00007FF6C0B8CF45+75717]
+	GetHandleVerifier [0x00007FF6C0B8CFA0+75808]
+	(No symbol) [0x00007FF6C0958F9A]
+	(No symbol) [0x00007FF6C0931B41]
+	(No symbol) [0x00007FF6C09DEC2E]
+	(No symbol) [0x00007FF6C09FECC2]
+	(No symbol) [0x00007FF6C09D7153]
+	(No symbol) [0x00007FF6C09A0421]
+	(No symbol) [0x00007FF6C09A11B3]
+	GetHandleVerifier [0x00007FF6C0E8D71D+3223453]
+	GetHandleVerifier [0x00007FF6C0E87CC2+3200322]
+	GetHandleVerifier [0x00007FF6C0EA5AF3+3322739]
+	GetHandleVerifier [0x00007FF6C0BA6A1A+180890]
+	GetHandleVerifier [0x00007FF6C0BAE11F+211359]
+	GetHandleVerifier [0x00007FF6C0B95294+109332]
+	GetHandleVerifier [0x00007FF6C0B95442+109762]
+	GetHandleVerifier [0x00007FF6C0B7BA59+4825]
+	BaseThreadInitThunk [0x00007FF90B7DE8D7+23]
+	RtlUserThreadStart [0x00007FF90C45C5DC+44]
 
-2025-05-20 18:58:20 - ERROR - 元素定位失败: ('xpath', '/html/body/div[1]/div/main/div[1]/div/div[1]/div/div')
-2025-05-20 18:58:32 - ERROR - 元素定位失败: ('xpath', '//button[contains(@class, "logout-button")]')
-2025-05-20 19:02:20 - INFO - 登入成功
-2025-05-20 19:02:20 - INFO - 登录流程已执行
-2025-05-20 19:02:20 - WARNING - 重试 test_login 第 1 次, 错误: 登录后首页校验失败
+2025-06-01 19:11:21 - WARNING - 重试 test_login 第 1 次, 错误: 登录失败
 assert False
- +  where False = is_login_success()
- +    where is_login_success = <page_objects.dashboard_page.DashboardPage object at 0x000002450C19EAF0>.is_login_success
-2025-05-20 19:02:25 - INFO - 登入成功
-2025-05-20 19:02:25 - INFO - 登录流程已执行
-2025-05-20 19:02:36 - ERROR - 元素定位失败: ('xpath', '//button[contains(@class, "logout-button")]')
-2025-05-20 19:02:52 - INFO - 登入成功
-2025-05-20 19:02:52 - INFO - 登录流程已执行
-2025-05-20 19:02:52 - WARNING - 重试 test_login 第 1 次, 错误: 登录后首页校验失败
-assert False
- +  where False = is_login_success()
- +    where is_login_success = <page_objects.dashboard_page.DashboardPage object at 0x0000016783F71A60>.is_login_success
-2025-05-20 19:02:58 - INFO - 登入成功
-2025-05-20 19:02:58 - INFO - 登录流程已执行
-2025-05-20 19:03:08 - ERROR - 元素定位失败: ('xpath', '//button[contains(@class, "logout-button")]')
-2025-05-20 19:04:48 - INFO - 登入成功
-2025-05-20 19:04:48 - INFO - 登录流程已执行
-2025-05-20 19:04:48 - WARNING - 重试 test_login 第 1 次, 错误: 登录后首页校验失败
-assert False
- +  where False = is_login_success()
- +    where is_login_success = <page_objects.dashboard_page.DashboardPage object at 0x00000166B917D310>.is_login_success
-2025-05-20 19:04:54 - INFO - 登入成功
-2025-05-20 19:04:54 - INFO - 登录流程已执行
-2025-05-20 19:05:04 - ERROR - 元素定位失败: ('xpath', '//button[contains(@class, "logout-button")]')
-2025-05-20 19:05:22 - INFO - 登入成功
-2025-05-20 19:05:22 - INFO - 登录流程已执行
-2025-05-20 19:05:22 - WARNING - 重试 test_login 第 1 次, 错误: 登录后首页校验失败
-assert False
- +  where False = is_login_success()
- +    where is_login_success = <page_objects.dashboard_page.DashboardPage object at 0x00000154658D3FD0>.is_login_success
-2025-05-20 19:05:39 - ERROR - 元素定位失败: ('xpath', '//button[contains(@class, "logout-button")]')
-2025-05-20 19:07:09 - INFO - 登入成功
-2025-05-20 19:07:09 - INFO - 登录流程已执行
-2025-05-20 19:07:09 - WARNING - 重试 test_login 第 1 次, 错误: 登录后首页校验失败
-assert False
- +  where False = is_login_success()
- +    where is_login_success = <page_objects.dashboard_page.DashboardPage object at 0x000002D03E583A30>.is_login_success
-2025-05-20 19:07:15 - INFO - 登入成功
-2025-05-20 19:07:15 - INFO - 登录流程已执行
-2025-05-20 19:07:26 - ERROR - 元素定位失败: ('xpath', '//button[contains(@class, "logout-button")]')
-2025-05-20 19:09:01 - INFO - 登入成功
-2025-05-20 19:09:01 - INFO - 登录流程已执行
-2025-05-20 19:09:01 - WARNING - 重试 test_login 第 1 次, 错误: 登录后首页校验失败
-assert False
- +  where False = is_login_success()
- +    where is_login_success = <page_objects.dashboard_page.DashboardPage object at 0x0000015E05087550>.is_login_success
-2025-05-20 19:09:06 - INFO - 登入成功
-2025-05-20 19:09:07 - INFO - 登录流程已执行
-2025-05-20 19:09:17 - ERROR - 元素定位失败: ('xpath', '//button[contains(@class, "logout-button")]')
-2025-05-20 19:33:23 - INFO - 登入成功
-2025-05-20 19:33:23 - INFO - 登录流程已执行
-2025-05-20 19:33:23 - WARNING - 重试 test_login 第 1 次, 错误: 登录后首页校验失败
-assert False
- +  where False = is_login_success()
- +    where is_login_success = <page_objects.dashboard_page.DashboardPage object at 0x0000024F0CA06400>.is_login_success
-2025-05-20 19:33:28 - INFO - 登入成功
-2025-05-20 19:33:29 - INFO - 登录流程已执行
-2025-05-20 19:33:39 - ERROR - 元素定位失败: ('xpath', '//button[contains(@class, "logout-button")]')
-2025-05-20 19:34:50 - INFO - 登入成功
-2025-05-20 19:34:50 - INFO - 登录流程已执行
-2025-05-20 19:34:50 - WARNING - 重试 test_login 第 1 次, 错误: 登录后首页校验失败
-assert False
- +  where False = is_login_success()
- +    where is_login_success = <page_objects.dashboard_page.DashboardPage object at 0x0000029E14F1AC40>.is_login_success
-2025-05-20 19:34:55 - INFO - 登入成功
-2025-05-20 19:34:55 - INFO - 登录流程已执行
-2025-05-20 19:35:06 - ERROR - 元素定位失败: ('xpath', '//button[contains(@class, "logout-button")]')
-2025-05-20 19:36:47 - INFO - 登入成功
-2025-05-20 19:36:47 - INFO - 登录流程已执行
-2025-05-20 19:36:47 - WARNING - 重试 test_login 第 1 次, 错误: 登录后首页校验失败
-assert False
- +  where False = is_login_success()
- +    where is_login_success = <page_objects.dashboard_page.DashboardPage object at 0x0000026E613F9760>.is_login_success
-2025-05-20 19:37:04 - ERROR - 元素定位失败: ('xpath', '//button[contains(@class, "logout-button")]')
-2025-05-20 19:56:13 - INFO - 登入成功
-2025-05-20 19:56:13 - INFO - 登录流程已执行
-2025-05-20 19:56:13 - WARNING - 重试 test_login 第 1 次, 错误: 登录后首页校验失败
-assert False
- +  where False = is_login_success()
- +    where is_login_success = <page_objects.dashboard_page.DashboardPage object at 0x000001CE41377E80>.is_login_success
-2025-05-20 19:56:18 - INFO - 登入成功
-2025-05-20 19:56:18 - INFO - 登录流程已执行
-2025-05-20 19:56:29 - ERROR - 元素定位失败: ('xpath', '//button[contains(@class, "logout-button")]')
-2025-05-20 20:21:33 - INFO - 开始登录流程
-2025-05-20 20:21:36 - INFO - 输入用户名: 1062174229@qq.com
-2025-05-20 20:21:36 - INFO - 输入密码
-2025-05-20 20:21:36 - INFO - 点击登录按钮
-2025-05-20 20:21:37 - INFO - 等待页面加载完成
-2025-05-20 20:21:37 - ERROR - 发生未预期的错误: 'LoginPage' object has no attribute 'is_element_visible'
-2025-05-20 20:21:40 - INFO - 开始登录流程
-2025-05-20 20:21:43 - INFO - 输入用户名: 1062174229@qq.com
-2025-05-20 20:21:43 - INFO - 输入密码
-2025-05-20 20:21:43 - INFO - 点击登录按钮
-2025-05-20 20:21:43 - INFO - 等待页面加载完成
-2025-05-20 20:21:43 - ERROR - 发生未预期的错误: 'LoginPage' object has no attribute 'is_element_visible'
+2025-06-01 19:11:23 - INFO - 开始登录流程
+2025-06-01 19:11:23 - ERROR - 登录过程发生异常: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=136.0.7103.114)
+Stacktrace:
+	GetHandleVerifier [0x00007FF6C0B8CF45+75717]
+	GetHandleVerifier [0x00007FF6C0B8CFA0+75808]
+	(No symbol) [0x00007FF6C0958F9A]
+	(No symbol) [0x00007FF6C0931B41]
+	(No symbol) [0x00007FF6C09DEC2E]
+	(No symbol) [0x00007FF6C09FECC2]
+	(No symbol) [0x00007FF6C09D7153]
+	(No symbol) [0x00007FF6C09A0421]
+	(No symbol) [0x00007FF6C09A11B3]
+	GetHandleVerifier [0x00007FF6C0E8D71D+3223453]
+	GetHandleVerifier [0x00007FF6C0E87CC2+3200322]
+	GetHandleVerifier [0x00007FF6C0EA5AF3+3322739]
+	GetHandleVerifier [0x00007FF6C0BA6A1A+180890]
+	GetHandleVerifier [0x00007FF6C0BAE11F+211359]
+	GetHandleVerifier [0x00007FF6C0B95294+109332]
+	GetHandleVerifier [0x00007FF6C0B95442+109762]
+	GetHandleVerifier [0x00007FF6C0B7BA59+4825]
+	BaseThreadInitThunk [0x00007FF90B7DE8D7+23]
+	RtlUserThreadStart [0x00007FF90C45C5DC+44]
+
+2025-06-01 19:11:23 - ERROR - 截图失败: Message: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=136.0.7103.114)
+Stacktrace:
+	GetHandleVerifier [0x00007FF6C0B8CF45+75717]
+	GetHandleVerifier [0x00007FF6C0B8CFA0+75808]
+	(No symbol) [0x00007FF6C0958F9A]
+	(No symbol) [0x00007FF6C0931B41]
+	(No symbol) [0x00007FF6C09DEC2E]
+	(No symbol) [0x00007FF6C09FECC2]
+	(No symbol) [0x00007FF6C09D7153]
+	(No symbol) [0x00007FF6C09A0421]
+	(No symbol) [0x00007FF6C09A11B3]
+	GetHandleVerifier [0x00007FF6C0E8D71D+3223453]
+	GetHandleVerifier [0x00007FF6C0E87CC2+3200322]
+	GetHandleVerifier [0x00007FF6C0EA5AF3+3322739]
+	GetHandleVerifier [0x00007FF6C0BA6A1A+180890]
+	GetHandleVerifier [0x00007FF6C0BAE11F+211359]
+	GetHandleVerifier [0x00007FF6C0B95294+109332]
+	GetHandleVerifier [0x00007FF6C0B95442+109762]
+	GetHandleVerifier [0x00007FF6C0B7BA59+4825]
+	BaseThreadInitThunk [0x00007FF90B7DE8D7+23]
+	RtlUserThreadStart [0x00007FF90C45C5DC+44]
+

@@ -1,6 +1,0 @@
-[32mINFO    [0m root:login_page.py:19 开始登录流程
-[32mINFO    [0m root:login_page.py:21 输入用户名: 1062174229@qq.com
-[32mINFO    [0m root:login_page.py:23 输入密码
-[32mINFO    [0m root:login_page.py:25 点击登录按钮
-[32mINFO    [0m root:login_page.py:27 等待页面加载完成
-[1m[31mERROR   [0m root:login_page.py:42 发生未预期的错误: 'LoginPage' object has no attribute 'is_element_visible'
