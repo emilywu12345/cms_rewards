@@ -62,9 +62,12 @@ def create_driver(request, config):
         WebDriver实例
     """
     try:
+        logging.info("开始创建浏览器实例")
         browser = request.config.getoption("--browser")
         headless = request.config.getoption("--headless")
         browser_config = config.get('browser', {})
+        
+        logging.info(f"浏览器类型: {browser}, 无头模式: {headless}")
         
         options = Options()
         
@@ -72,26 +75,22 @@ def create_driver(request, config):
         if headless.lower() == "true" or browser_config.get('headless', False):
             options.add_argument("--headless=new")
             
-          # 添加SSL证书处理选项
+        # 添加SSL证书处理选项
         options.add_argument('--ignore-certificate-errors')
         options.add_argument('--ignore-ssl-errors')
         options.add_argument('--allow-insecure-localhost')
         options.add_argument('--disable-web-security')
         options.add_experimental_option('excludeSwitches', ['enable-logging'])
         
-        # 从配置文件加载浏览器参数
-        capabilities = browser_config.get('capabilities', {})
+        # 添加其他必要的选项
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
         
-        # 添加浏览器启动参数
-        for arg in capabilities.get('args', []):
-            options.add_argument(arg)
-        
-        # 添加浏览器首选项
-        for key, value in capabilities.get('prefs', {}).items():
-            options.add_experimental_option("prefs", {key: value})
+        logging.info("浏览器选项配置完成")
         
         if browser.lower() == "chrome":
             driver = webdriver.Chrome(options=options)
+            logging.info("Chrome浏览器实例创建成功")
         else:
             raise ValueError(f"不支持的浏览器类型: {browser}")
         
@@ -101,6 +100,7 @@ def create_driver(request, config):
         if 'script_timeout' in browser_config:
             driver.set_script_timeout(browser_config['script_timeout'])
         
+        logging.info("浏览器配置完成")
         return driver
         
     except Exception as e:

@@ -12,10 +12,11 @@ class LoginPage(BasePage):
     USERNAME_INPUT = (By.CSS_SELECTOR, '.el-input__inner[type="text"]')  # 使用者名稱輸入框
     PASSWORD_INPUT = (By.CSS_SELECTOR, '.el-input__inner[type="password"]')  # 密碼輸入框
     LOGIN_BUTTON = (By.CSS_SELECTOR, '.el-button--primary')  # 登入按鈕
-    TITLE_MESSAGE = (By.XPATH, '/html/body/div[1]/div/main/div[1]/div/div[1]/div/div/div/div')  # 更新主頁標題選擇器
+    MODEL_MENU = (By.XPATH, '0/html/body/div[1]/div/div[1]/div/ul/li[2]/div/span')  # 點擊AI模型
 
     @allure.step("執行登入操作")
     def login(self, username: str, password: str) -> bool:
+        """执行登录操作"""
         try:
             logger.info(f"開始登入操作: {username}")
             
@@ -28,18 +29,22 @@ class LoginPage(BasePage):
             
             # 點擊登入按鈕
             self.find_element(self.LOGIN_BUTTON).click()
-
-            # 等待主頁標題出現
-            self.wait_for_element(self.TITLE_MESSAGE)
-            logging.info('登入成功')
-            return True
+            
+            # 等待AI模型菜單出現
+            if self.wait_for_element(self.MODEL_MENU, timeout=10):
+                self.find_element(self.MODEL_MENU).click()
+                return True  # 登入成功
+            else:
+                logger.error('登入失敗: 未找到AI模型菜單')
+                self.take_screenshot("登入失敗")
+                return False
 
         except NoSuchElementException as e:
-            logging.error(f'登入失敗: 元素未找到 - {str(e)}')
+            logger.error(f'登入失敗: 元素未找到 - {str(e)}')
             self.take_screenshot("登入失敗")
             return False
 
         except Exception as e:
-            logging.error(f"登入過程發生異常: {str(e)}")
+            logger.error(f"登入過程發生異常: {str(e)}")
             self.take_screenshot("登入異常")
             return False

@@ -44,12 +44,4 @@ class TestLogin:
                 username=username,
                 password=password
             )
-            if not result:
-                ScreenshotManager.get_instance().take_screenshot(driver, "login_failed")
-                allure.attach.file(
-                    "login_failed.png",
-                    name="登录失败截图",
-                    attachment_type=allure.attachment_type.PNG
-                )
             assert result, "登入失敗：無法完成登入操作"
-
