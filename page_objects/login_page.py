@@ -1,6 +1,3 @@
-
-
-
 import allure
 import time
 from selenium.webdriver.common.by import By
@@ -13,15 +10,20 @@ from utils.log_manager import logger
 class LoginPage(BasePage):
     """登入頁面操作封裝"""
 
-    # 元素定位
+    # 正常登入元素定位
     USERNAME_INPUT = (By.CSS_SELECTOR, '.el-input__inner[type="text"]')
     PASSWORD_INPUT = (By.CSS_SELECTOR, '.el-input__inner[type="password"]')
     LOGIN_BUTTON = (By.CSS_SELECTOR, '.el-button--primary')
     MODEL_MENU = (By.XPATH, '/html/body/div[1]/div/div[1]/div/ul/li[2]/div/span')
 
-    @allure.step("執行登入操作")
+    @allure.step("執行正常登入操作")
     def login(self, username: str, password: str, timeout: int = 30) -> bool:
-        """執行登入并返回是否成功"""
+        """使用賬號密碼登入系統
+        :param username: 登入賬號
+        :param password: 登入密碼
+        :param timeout: 等待超時時間
+        :return: 登入是否成功
+        """
         try:
             logger.info(f"登入操作: {username}")
 
@@ -39,7 +41,7 @@ class LoginPage(BasePage):
             logger.info("等待AI模型菜單出現...")
             WebDriverWait(self.driver, timeout).until(
                 EC.visibility_of_element_located(self.MODEL_MENU))
-            time.sleep(1)  # 等待菜單加載
+            time.sleep(1) 
             logger.info("登入成功: 檢測到AI模型菜單")
             self.take_screenshot("登入成功")
             return True  # 登入成功
@@ -61,3 +63,5 @@ class LoginPage(BasePage):
             logger.error(f"登入失敗: 發生未知異常 - {str(e)}")
             self.take_screenshot("登入異常")
             return False
+        
+
