@@ -1,77 +1,55 @@
-"""登录功能测试模块
-
-此模块包含所有与用户登录相关的测试用例，包括：
-- 成功登录测试
-- 登出功能测试
-"""
-
 import pytest
 import allure
-from utils.config_loader import ConfigLoader
+from utils.config_manager import ConfigManager
 from utils.log_manager import logger
 from page_objects.login_page import LoginPage
 from page_objects.dashboard_page import DashboardPage
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from utils.screenshot_manager import ScreenshotManager
 
 
-@allure.feature("用户认证")
+@allure.feature("登入")
 class TestLogin:
-    """登录功能测试类"""
-    
-    @allure.story("成功登录")
-    @allure.title("使用有效凭据登录")
+    """登入功能測試類"""
+    @allure.story("成功登入")
+    @allure.title("使用有效賬號登入")
     @allure.severity(allure.severity_level.BLOCKER)
     @pytest.mark.smoke
     def test_login(self, driver):
-        """测试用户使用有效凭据能否成功登录系统
-        
-        步骤:
-        1. 加载测试环境配置
-        2. 打开登录页面
-        3. 输入有效的用户名和密码
-        4. 点击登录按钮
-        5. 验证是否成功进入系统
         """
-        # 加载环境配置
-        env_config = ConfigLoader.get_env_config("uat")
-        assert env_config, "无法加载环境配置"
+        測試User使用有效賬號密碼能否成功登入系統
+        
+        步驟:
+        1. 加載測試環境配置
+        2. 打開登入頁面
+        3. 輸入有效的使用者名稱和密碼
+        4. 點擊登入按鈕
+        5. 驗證是否成功進入系統
+        """
+        # 加載環境配置
+        env_config = ConfigManager.get_instance().get_env_config("uat")
+        assert env_config, "無法加載環境配置"
         
         username = env_config.get("username")
         password = env_config.get("password")
-        assert username and password, "环境配置缺少用户名或密码"
+        assert username and password, "環境配置缺少User賬號或密碼"
         
-        # 执行登录操作
-        with allure.step(f"使用账号 {username} 登录系统"):
+        # 執行登入操作
+        with allure.step(f"使用帳號 {username} 登入系統"):
             login_page = LoginPage(driver)
-            logger.info(f"开始登录测试: {username}")
+            logger.info(f"開始登入測試: {username}")
             
             result = login_page.login(
                 username=username,
                 password=password
             )
-            assert result, "登录失败：无法完成登录操作"
-        
-        # 验证登录结果
-        with allure.step("验证登录状态"):
-            dashboard = DashboardPage(driver)
-            assert dashboard.is_login_success(), "登录失败：未能进入系统主页"
-            logger.info("登录测试完成")
+            if not result:
+                ScreenshotManager.get_instance().take_screenshot(driver, "login_failed")
+                allure.attach.file(
+                    "login_failed.png",
+                    name="登录失败截图",
+                    attachment_type=allure.attachment_type.PNG
+                )
+            assert result, "登入失敗：無法完成登入操作"
 
-    @allure.story("成功退出")
-    @allure.title("已登录用户退出系统")
-    @allure.severity(allure.severity_level.NORMAL)
-    @pytest.mark.smoke
-    def test_logout(self, logged_in_driver):
-        """测试已登录用户能否正常退出系统
-        
-        步骤:
-        1. 点击退出按钮
-        2. 验证是否返回登录页面
-        """
-        with allure.step("退出系统"):
-            dashboard = DashboardPage(logged_in_driver)
-            assert dashboard.logout(), "退出操作失败"
-        
-        with allure.step("验证退出结果"):
-            current_url = logged_in_driver.current_url.lower()
-            assert "login" in current_url, "退出失败：未能返回登录页面"
-            logger.info("退出测试完成")

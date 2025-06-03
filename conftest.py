@@ -18,8 +18,11 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import WebDriverException
-from utils.config_loader import ConfigLoader
+from utils.config_manager import ConfigManager
 from page_objects.login_page import LoginPage
+
+# 确保项目根目录被正确添加到 PYTHONPATH
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 # 创建必要的目录
 for dir_path in ['logs', 'screenshots', 'reports/allure-results']:
@@ -47,7 +50,7 @@ def pytest_addoption(parser):
 @pytest.fixture(scope="session")
 def config():
     """加载配置文件"""
-    return ConfigLoader.load_config()
+    return ConfigManager.get_instance()._config
 
 def create_driver(request, config):
     """
@@ -69,9 +72,6 @@ def create_driver(request, config):
         if headless.lower() == "true" or browser_config.get('headless', False):
             options.add_argument("--headless=new")
             
-        # 忽略证书错误
-        options.add_argument('--ignore-certificate-errors')
-        options.add_argument('--ignore-ssl-errors')
           # 添加SSL证书处理选项
         options.add_argument('--ignore-certificate-errors')
         options.add_argument('--ignore-ssl-errors')
@@ -125,61 +125,66 @@ def safe_screenshot(driver, name):
         logging.error(f"截图时发生未知错误: {str(e)}")
         return None
 
-@pytest.fixture(scope="function")
-def driver(request, config):
+@pytest.fixture(scope="function")  # 標記這是一個函數級別的fixture，每個測試函數執行一次
+def driver(request, config):  # 接收pytest的request對象和config配置
     """
     基础浏览器夹具 - 不执行登录
     用于需要测试未登录状态的用例
     """
-    driver = None
+    driver = None  # 初始化driver為None，確保finally塊能安全判斷
     try:
-        driver = create_driver(request, config)
-        request.instance.driver = driver
-        yield driver
+        # 創建瀏覽器實例（根據命令行參數和config配置）
+        driver = create_driver(request, config)  
+        # 將driver綁定到測試類實例（方便測試類中直接使用self.driver）
+        request.instance.driver = driver  
+        yield driver  # 返回driver給測試函數使用
     finally:
-        if driver:
+        if driver:  # 確保driver存在才執行退出
             try:
-                driver.quit()
+                driver.quit()  # 關閉瀏覽器
             except Exception as e:
-                logging.error(f"关闭浏览器失败: {str(e)}")
-
-@pytest.fixture(scope="function")
-def logged_in_driver(request, config):
+                logging.error(f"关闭浏览器失败: {str(e)}")  # 記錄關閉失敗的錯誤
+                
+@pytest.fixture(scope="function")  # 函數級別的fixture
+def logged_in_driver(request, config):  # 接收request和config
     """
     已登录状态的浏览器夹具
     用于需要测试已登录状态的用例
     """
     driver = None
     try:
-        driver = create_driver(request, config)
-        env_config = ConfigLoader.get_env_config(request.config.getoption("--env"))
+        # 創建瀏覽器實例（與driver fixture相同）
+        driver = create_driver(request, config)  
+        # 根據命令行參數--env加載對應環境的配置（如UAT或QA環境的用戶名/密碼）
+        env_config = ConfigManager.get_instance().get_env_config(request.config.getoption("--env"))  
         
-        # 执行登录
-        login_page = LoginPage(driver)
-        login_result = login_page.login(
-            env_config.get('username'),
-            env_config.get('password')
+        # 執行登錄操作
+        login_page = LoginPage(driver)  # 初始化登錄頁面對象
+        login_result = login_page.login(  # 調用登錄方法
+            env_config.get('username'),  # 從配置讀取用戶名
+            env_config.get('password')   # 從配置讀取密碼
         )
         
+        # 登錄失敗處理
         if not login_result:
-            screenshot = safe_screenshot(driver, "login_failed")
+            screenshot = safe_screenshot(driver, "login_failed")  # 截圖保存失敗場景
             if screenshot:
-                allure.attach(
+                allure.attach(  # 將截圖附加到Allure報告
                     screenshot,
                     name="login_failed",
                     attachment_type=allure.attachment_type.PNG
                 )
-            pytest.fail("前置登录失败，无法继续测试")
+            pytest.fail("前置登录失败，无法继续测试")  # 主動標記測試失敗
         
-        request.instance.driver = driver
-        yield driver
+        # 綁定driver並返回（與driver fixture相同）
+        request.instance.driver = driver  
+        yield driver  
     finally:
-        if driver:
+        if driver:  # 關閉瀏覽器（與driver fixture相同）
             try:
-                driver.quit()
+                driver.quit()  
             except Exception as e:
-                logging.error(f"关闭浏览器失败: {str(e)}")
-
+                logging.error(f"关闭浏览器失败: {str(e)}")  
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):
     """

@@ -5,7 +5,6 @@ from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.common.exceptions import WebDriverException
 import allure
 from .log_manager import logger
-from .config_manager import ConfigManager
 
 
 class ScreenshotManager:
@@ -14,16 +13,15 @@ class ScreenshotManager:
     _instance = None
     
     @classmethod
-    def get_instance(cls):
+    def get_instance(cls, screenshot_dir: str):
         """单例模式获取实例"""
         if cls._instance is None:
-            cls._instance = ScreenshotManager()
+            cls._instance = ScreenshotManager(screenshot_dir)
         return cls._instance
     
-    def __init__(self):
+    def __init__(self, screenshot_dir: str):
         """初始化截图管理器"""
-        self.config = ConfigManager.get_instance()
-        self.screenshot_dir = self.config.get_screenshot_dir()
+        self.screenshot_dir = screenshot_dir
         os.makedirs(self.screenshot_dir, exist_ok=True)
     
     def take_screenshot(
@@ -66,6 +64,8 @@ class ScreenshotManager:
                     )
                     
             logger.screenshot_log(f"截图已保存: {name}", filepath)
+            logger.info(f"截图保存路径: {self.screenshot_dir}")
+            logger.info(f"截图文件名: {filename}")
             return filepath
             
         except Exception as e:
@@ -91,4 +91,5 @@ class ScreenshotManager:
 
 
 # 创建全局截图管理器实例
-screenshot = ScreenshotManager.get_instance()
+screenshot_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "screenshots"))
+screenshot = ScreenshotManager.get_instance(screenshot_dir)
