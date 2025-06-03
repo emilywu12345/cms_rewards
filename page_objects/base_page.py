@@ -134,7 +134,7 @@ class BasePage:
             screenshot.take_screenshot(self.driver, "click_error")
             return False
 
-    def input_text(self, locator: Tuple[str, str], text: str, clear: bool = True, timeout: int = None) -> bool:
+    def send_keys(self, locator: Tuple[str, str], text: str, clear: bool = True, timeout: int = None) -> bool:
         """
         向输入框输入文本
         
