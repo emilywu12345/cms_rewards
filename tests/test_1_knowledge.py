@@ -6,21 +6,26 @@ from page_objects.knowledge_page import KnowledgePage
 from utils.config_manager import ConfigManager
 
 @allure.feature("知识库管理")
+@pytest.mark.usefixtures("class_logged_in_driver")
 class TestKnowledge:
+    @pytest.fixture(autouse=True, scope="class")
+    def setup_class(self, class_logged_in_driver):
+        self.driver = class_logged_in_driver
+
     @allure.story("导航到知识库")
     @allure.description("验证用户能否成功進入知识库")
-    @pytest.mark.usefixtures("logged_in_driver")
-    def test_navigate_to_knowledge(self, logged_in_driver):
-        kb_page = KnowledgePage(logged_in_driver)
+    def test_1_navigate_knowledge(self):
+        kb_page = KnowledgePage(self.driver)
         with allure.step("导航到知识库"):
             logging.info("等待页面加载完成")
-            result = kb_page.navigate_to_knowledge()
-            allure.attach(
-                logged_in_driver.get_screenshot_as_png(),
-                name="導航到知识库结果",
-                attachment_type=allure.attachment_type.PNG
-            )
-            assert result, "導航到知识库失败"
+            assert kb_page.navigate_knowledge(),"导航到知识库失败"
+
+    @allure.story("导航到知识库-无driver参数应报错")
+    def test_2_navigate_knowledge(self):
+        kb_page = KnowledgePage(self.driver)
+        with allure.step("导航到知识库"):
+            logging.info("等待页面加载完成")
+            assert kb_page.navigate_knowledge(),"导航到知识库失败"
     
     # @allure.story("创建知识库")
     # @allure.description("验证用户能否成功创建新的知识库")

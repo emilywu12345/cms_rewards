@@ -185,6 +185,34 @@ def logged_in_driver(request, config):  # 接收request和config
                 driver.quit()  
             except Exception as e:
                 logging.error(f"关闭浏览器失败: {str(e)}")  
+
+@pytest.fixture(scope="class")
+def class_logged_in_driver(request, config):
+    """
+    类级别的已登录状态浏览器夹具
+    用于需要在类级别共享登录状态的用例
+    """
+    driver = None
+    try:
+        # 创建浏览器实例
+        driver = create_driver(request, config)
+        # 根据命令行参数--env加载对应环境的配置
+        env_config = ConfigManager.get_instance().get_env_config(request.config.getoption("--env"))
+        # 初始化登录页面对象
+        from page_objects.login_page import LoginPage
+        login_page = LoginPage(driver)
+        # 执行登录操作
+        login_result = login_page.login(env_config.get('username'), env_config.get('password'))
+        # 登录失败处理
+        if not login_result:
+            pytest.fail("前置登录失败，无法继续测试")
+        # 绑定driver到测试类实例
+        request.cls.driver = driver
+        yield driver
+    finally:
+        if driver:
+            driver.quit()
+
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):
     """

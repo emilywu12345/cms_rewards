@@ -13,7 +13,8 @@ class KnowledgePage(BasePage):
     
     # 页面元素定位器
     KNOWLEDGE = (By.XPATH, '//*[@class="title" and text()="知识库"]')  
-    KNOWLEDGE_TITLE = (By.XPATH, '//*[@class="title" and text()="知识库管理"]')                                           # 知识库菜单
+    KNOWLEDGE_TITLE = (By.XPATH, '//*[@class="title" and text()="知识库管理"]')   
+    MODEL_MENU = (By.XPATH, '/html/body/div[1]/div/div[1]/div/ul/li[2]/div/span')                                        # 知识库菜单
     # CREATE_KB_BUTTON = (By.XPATH, '//*[@class="create-knowledge-base"]')              # 创建知识库按钮
     # KB_NAME_INPUT = (By.XPATH, '//*[@placeholder="请输入知识库名称"]')         # 知识库名称输入框
     # KB_DESC_INPUT = (By.XPATH, '//*[@placeholder="请输入知识库描述"]')         # 知识库描述输入框
@@ -41,40 +42,52 @@ class KnowledgePage(BasePage):
     # KB_LIST = (By.XPATH, '//*[@class="title" and text()="知识库"]')
     # SUCCESS_MESSAGE = ('xpath', '//div[contains(@class, "success-message")]')
     @allure.step("进入知识库管理页面")
-    def navigate_to_knowledge(self):
+    def navigate_knowledge(self):
         """导航到知识库管理页面"""
         try:
-            logging.info('正在进入知识库管理页面')
-            self.find_element(self.KNOWLEDGE).click()
-
-            # 等待知识库管理页面加载
-            logging.info('等待知识库管理页面加载...')
-            WebDriverWait(self.driver, self.wait_times['medium']).until(
-                    EC.presence_of_element_located(self.KNOWLEDGE_TITLE)
-                )
-            time.sleep(1)
-            self.take_screenshot("进入知识库管理页面")
-            logging.info('成功进入知识库管理页面')
+            # 先等待loading遮罩消失
+            self.wait_loading_disappear(timeout=15)
+            self.wait_and_click(self.KNOWLEDGE)
+            if not self.wait_for_element(self.KNOWLEDGE_TITLE, timeout=self.timeout):
+                logger.error('知识库页面标题未出现，导航失败')
+                self.take_screenshot('navigation_failed')
+                return False
+            logger.info('成功导航到知识库页面')
             return True
-
-
-        # 当使用 find_element 或 find_elements 方法尝试查找页面上的元素，但元素不存在时，会抛出此异常
         except NoSuchElementException as e:
-            logger.error(f'登入失敗: 元素未找到 - {str(e)}')
-            self.take_screenshot("登入失敗")
+            logger.error(f'导航失败: 元素未找到 - {str(e)}')
+            self.take_screenshot("navigation_failed")
             return False
-
-        # 当使用显式等待（如 WebDriverWait）等待某个元素或条件出现，但超过了指定的超时时间仍未满足条件时，会抛出此异常
         except TimeoutException as e:
-            logger.error(f'登入失敗: 等待元素超時 - {str(e)}')
-            self.take_screenshot("登入失敗")
+            logger.error(f'导航失败: 等待元素超时 - {str(e)}')
+            self.take_screenshot("navigation_failed")
+            return False
+        except Exception as e:
+            logger.error(f"导航失败: 发生未知异常 - {str(e)}")
+            self.take_screenshot("navigation_failed")
             return False
 
-        # 当上述两种特定异常（NoSuchElementException 和 TimeoutException）都不匹配时，会进入这个块来处理其他未知的异常
-        except Exception as e:
-            logger.error(f"登入失敗: 發生未知異常 - {str(e)}")
-            self.take_screenshot("登入異常")
+    @allure.step("进入AI model页面")
+    def navigate_model(self):
+        """导航到AI model页面"""
+        try:
+            self.wait_and_click(self.MODEL_MENU)
+            logger.info('成功导航到AI model页面')
+            return True
+        except NoSuchElementException as e:
+            logger.error(f'导航失败: 元素未找到 - {str(e)}')
+            self.take_screenshot("navigation_failed")
             return False
+        except TimeoutException as e:
+            logger.error(f'导航失败: 等待元素超时 - {str(e)}')
+            self.take_screenshot("navigation_failed")
+            return False
+        except Exception as e:
+            logger.error(f"导航失败: 发生未知异常 - {str(e)}")
+            self.take_screenshot("navigation_failed")
+            return False
+
+
 
     # @allure.step("创建知识库")
     # def create_knowledge_base(self, name, description, model="OpenAI-Embedding-Azure"):
@@ -406,3 +419,13 @@ class KnowledgePage(BasePage):
     #         logging.error(f"wait_and_click 失败: {str(e)}")
     #         self.take_screenshot("wait_and_click_failed")
     #         return False
+
+    def wait_loading_disappear(self, timeout=15):
+        """等待全屏loading遮罩消失"""
+        try:
+            WebDriverWait(self.driver, timeout).until_not(
+                EC.visibility_of_element_located((By.CSS_SELECTOR, ".el-loading-mask.is-fullscreen"))
+            )
+            return True
+        except Exception:
+            return False

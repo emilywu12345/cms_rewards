@@ -3,6 +3,9 @@ import allure
 from utils.config_manager import ConfigManager
 from utils.log_manager import logger
 from page_objects.login_page import LoginPage
+
+
+
 @allure.feature("登入")
 @allure.story("成功登入")
 @allure.title("使用有效賬號登入")
