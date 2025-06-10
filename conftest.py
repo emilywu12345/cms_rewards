@@ -199,7 +199,6 @@ def class_logged_in_driver(request, config):
         # 根据命令行参数--env加载对应环境的配置
         env_config = ConfigManager.get_instance().get_env_config(request.config.getoption("--env"))
         # 初始化登录页面对象
-        from page_objects.login_page import LoginPage
         login_page = LoginPage(driver)
         # 执行登录操作
         login_result = login_page.login(env_config.get('username'), env_config.get('password'))

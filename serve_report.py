@@ -19,32 +19,35 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=DIRECTORY, **kwargs)
 
+# 啟動 Allure 報告伺服器，並自動開啟瀏覽器
+# 伺服器啟動後，按 Ctrl+C 可停止
+
 def run_server():
     try:
         server = socketserver.TCPServer(("", PORT), Handler)
         url = f"http://localhost:{PORT}"
-        print(f"正在启动 Allure 报告服务器...")
-        print(f"请在浏览器中访问: {url}")
+        print(f"正在啟動 Allure 報告伺服器...")
+        print(f"請在瀏覽器中訪問: {url}")
         
-        # 在新线程中启动服务器
+        # 在新執行緒中啟動伺服器
         server_thread = threading.Thread(target=server.serve_forever)
         server_thread.daemon = True
         server_thread.start()
         
-        # 打开浏览器
+        # 開啟瀏覽器
         webbrowser.open(url)
-        print("服务器已启动，请按 Ctrl+C 停止")
+        print("伺服器已啟動，請按 Ctrl+C 停止")
         
         try:
             while True:
-                input()  # 保持程序运行直到按 Ctrl+C
+                input()  # 保持程式運行直到按 Ctrl+C
         except KeyboardInterrupt:
-            print("\n正在停止服务器...")
+            print("\n正在停止伺服器...")
             server.shutdown()
             server.server_close()
-            print("服务器已停止")
+            print("伺服器已停止")
     except Exception as e:
-        print(f"启动服务器时发生错误: {e}")
+        print(f"啟動伺服器時發生錯誤: {e}")
 
 if __name__ == '__main__':
     run_server()

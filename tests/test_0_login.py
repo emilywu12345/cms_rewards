@@ -6,38 +6,38 @@ from page_objects.login_page import LoginPage
 
 
 
-@allure.feature("登入")
-@allure.story("成功登入")
-@allure.title("使用有效賬號登入")
+@allure.feature("登录")
+@allure.story("成功登录")
+@allure.title("使用有效账号登录")
 @allure.severity(allure.severity_level.BLOCKER)
 @pytest.mark.smoke
 class TestLogin:
-    """登入功能測試類"""
+    """登录功能测试类"""
 
     @pytest.fixture(autouse=True)
     def setup(self, request):
-        """自動加載環境配置"""
-        self.env = request.config.getoption("--env")  # 從命令行獲取環境
+        """自动加载环境配置"""
+        self.env = request.config.getoption("--env")  # 从命令行获取环境
         self.env_config = ConfigManager.get_instance().get_env_config(self.env)
-        assert self.env_config, f"無法加載 {self.env} 環境配置"
-        assert self.env_config.get("username") and self.env_config.get("password"), "環境配置缺少賬號或密碼"
+        assert self.env_config, f"无法加载 {self.env} 环境配置"
+        assert self.env_config.get("username") and self.env_config.get("password"), "环境配置缺少账号或密码"
  
     def test_0_login(self, driver):
         """
-        測試User使用有效賬號密碼能否成功登入系統
+        测试User使用有效账号密码能否成功登录系统
         
-        步驟:
-        1. 加載測試環境配置
-        2. 打開登入頁面
-        3. 輸入有效的使用者名稱和密碼
-        4. 點擊登入按鈕
-        5. 驗證是否成功進入系統
+        步骤:
+        1. 加载测试环境配置
+        2. 打开登录页面
+        3. 输入有效的用户名和密码
+        4. 点击登录按钮
+        5. 验证是否成功进入系统
         """
         login_page = LoginPage(driver)
         username = self.env_config["username"]
         password = self.env_config["password"]
 
-        with allure.step(f"使用帳號 {username} 登入系統"):
-            logger.info(f"開始登入測試: {username}")
-            assert login_page.login(username, password), "登入失敗"
-            logger.info("登入測試完成，成功登入系統")
+        with allure.step(f"使用账号 {username} 登录系统"):
+            logger.info(f"开始登录测试: {username}")
+            assert login_page.login(username, password), "登录失败"
+            logger.info("登录测试完成，成功登录系统")

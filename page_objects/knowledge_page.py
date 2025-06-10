@@ -72,7 +72,8 @@ class KnowledgePage(BasePage):
         """导航到AI model页面"""
         try:
             self.wait_and_click(self.MODEL_MENU)
-            logger.info('成功导航到AI model页面')
+
+            logger.info('成功导航到知识库页面')
             return True
         except NoSuchElementException as e:
             logger.error(f'导航失败: 元素未找到 - {str(e)}')
