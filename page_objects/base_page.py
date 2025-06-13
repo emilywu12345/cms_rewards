@@ -1,8 +1,8 @@
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
 from utils.log_manager import logger
-from utils.screenshot_manager import screenshot
 from utils.config_manager import ConfigManager
 
 
@@ -23,7 +23,7 @@ class BasePage:
             )
         except TimeoutException:
             logger.error(f"元素定位失败: {locator}")
-            screenshot(self.driver, "element_not_found")
+            self.take_screenshot("element_not_found")
             raise
             
     def click(self, locator):
@@ -43,6 +43,10 @@ class BasePage:
             return False
 
     def take_screenshot(self, name):
+        """
+        调用全局 screenshot 管理器进行截图
+        """
+        from utils.screenshot_manager import screenshot
         screenshot.take_screenshot(self.driver, name)
         
     def wait_and_click(self, locator, timeout=None):
@@ -51,3 +55,17 @@ class BasePage:
             self.click(locator)
             return True
         return False
+    
+    
+    def wait_loading_disappear(self, timeout=15):
+        """
+        等待全局 loading 遮罩消失（适配 element-ui/el-loading-mask)
+        """
+        try:
+            WebDriverWait(self.driver, timeout).until_not(
+                EC.presence_of_element_located((By.CSS_SELECTOR, '.el-loading-mask'))
+            )
+            return True
+        except Exception as e:
+            logger.warning(f"等待 loading 遮罩消失超时: {str(e)}")
+            return False
