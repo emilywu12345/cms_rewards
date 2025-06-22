@@ -29,8 +29,8 @@ class TestKnowledge:
     def test_1_navigate_knowledge(self):
         """
         步骤：
-        1. 通过 KnowledgePage 进行导航
-        2. 断言页面跳转成功
+        1. 导航到知识库页面
+        2. 验证能否成功加载知识库页面
         """
         kb_page = KnowledgePage(self.driver)
         with allure.step("导航到知识库"):
@@ -42,7 +42,7 @@ class TestKnowledge:
     def test_2_create_knowledge(self):
         """
         步骤：
-        1. 输入知识库名称和描述
+        1. 输入知识库相关信息
         2. 提交并断言创建成功
         """
         kb_page = KnowledgePage(self.driver)

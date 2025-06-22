@@ -4,7 +4,7 @@ import shutil
 import argparse
 import logging
 from datetime import datetime
-from utils.config_loader import ConfigLoader
+from utils.config_manager import ConfigManager
 
 def parse_args():
     """

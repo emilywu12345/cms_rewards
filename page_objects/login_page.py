@@ -21,6 +21,8 @@ class LoginPage(BasePage):
         try:
             logger.info(f"登录操作: {username}")
             self.open()
+            # 先等待loading遮罩消失
+            self.wait_loading_disappear(timeout=15)
             # 输入账号密码
             self.input_text(self.USERNAME_INPUT, username)
             self.input_text(self.PASSWORD_INPUT, password)

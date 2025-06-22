@@ -18,4 +18,10 @@ def get_kb_create_data():
         "prompt": "快来创建知识库吧"
     }
 
-# 其他测试数据可按需扩展
+
+# AI 聊天数据
+def get_ai_chat_data():
+    return {
+        "message": "你好,AI!"
+    }
+    

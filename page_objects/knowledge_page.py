@@ -18,7 +18,6 @@ class KnowledgePage(BasePage):
     MODEL_MENU = (By.XPATH, '/html/body/div[1]/div/div[1]/div/ul/li[2]/div/span')                  
 
     # 知识库创建
-
     CREATE_KB_BUTTON = (By.XPATH, '//button[.//span[text()="新建"]]')
     KB_NAME_INPUT = (By.XPATH, '//input[@placeholder="请输入知识库名称"]')
     KB_PROMPT_INPUT = (By.XPATH, '/html/body/div[1]/div/main/div/div[3]/div/div/div/form/div[2]/div/div/div/input')
@@ -27,6 +26,7 @@ class KnowledgePage(BasePage):
     SELECT_MODEL_DROPDOWN = (By.XPATH, "//li[contains(@class, 'el-select-dropdown__item') and (contains(text(), 'Embedding') or contains(text(), '嵌入') or contains(text(), '向量'))]")
     SLIDER = (By.CSS_SELECTOR, 'div.el-slider__button.el-tooltip__trigger')
     CONFIRM_CREATE_BUTTON = (By.XPATH, '/html/body/div[1]/div/main/div/div[3]/div/div/footer/div/button[2]/span')
+
     # 创建成功提示信息
     CREATE_SUCCESS_MESSAGE = (By.XPATH, '//p[contains(@class, "el-message__content") and contains(text(), "保存成功")]')
 
@@ -42,19 +42,18 @@ class KnowledgePage(BasePage):
                 self.take_screenshot('navigation_failed')
                 return False
             logger.info('成功导航到知识库页面')
-            self.take_screenshot("navigation_success")
             return True
         except NoSuchElementException as e:
             logger.error(f'导航失败: 元素未找到 - {str(e)}')
-            self.take_screenshot("navigation_failed")
+            self.take_screenshot("进入导航页面失败")
             return False
         except TimeoutException as e:
             logger.error(f'导航失败: 等待元素超时 - {str(e)}')
-            self.take_screenshot("navigation_failed")
+            self.take_screenshot("进入导航页面失败")
             return False
         except Exception as e:
             logger.error(f"导航失败: 发生未知异常 - {str(e)}")
-            self.take_screenshot("navigation_failed")
+            self.take_screenshot("进入导航页面失败")
             return False
 
 
