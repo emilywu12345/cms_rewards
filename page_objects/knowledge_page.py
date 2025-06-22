@@ -100,7 +100,7 @@ class KnowledgePage(BasePage):
             # 等待创建成功提示出现
             self.wait_for_element(self.CREATE_SUCCESS_MESSAGE, timeout=10)
             time.sleep(1)
-            # self.take_screenshot("create_kb_success")
+            self.take_screenshot("创建知识库成功")
             return True
         except NoSuchElementException as e:
             logger.error(f'创建知识库失败: 元素未找到 - {str(e)}')

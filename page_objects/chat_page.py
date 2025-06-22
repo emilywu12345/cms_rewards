@@ -40,7 +40,7 @@ class ChatPage(BasePage):
             self.input_text(self.MESSAGE_INPUT, message)
             self.wait_and_click(self.SUBMIT_BUTTON)
             time.sleep(1)
-            self.take_screenshot("发送消息")
+            self.take_screenshot("发送消息成功")
             return True
         except NoSuchElementException as e:
             logger.error(f'聊天失败: 元素未找到 - {str(e)}')

@@ -125,7 +125,7 @@ def safe_screenshot(driver, name):
         logging.error(f"截图时发生未知错误: {str(e)}")
         return None
 
-@pytest.fixture(scope="function")  # 標記這是一個函數級別的fixture，每個測試函數執行一次
+@pytest.fixture(scope="session")  # 优化为会话级别，所有用例共享同一driver实例
 def driver(request, config):  # 接收pytest的request對象和config配置
     """
     基础浏览器夹具 - 不执行登录
@@ -133,19 +133,19 @@ def driver(request, config):  # 接收pytest的request對象和config配置
     """
     driver = None  # 初始化driver為None，確保finally塊能安全判斷
     try:
-        # 創建瀏覽器實例（根據命令行參數和config配置）
-        driver = create_driver(request, config)  
-        # 將driver綁定到測試類實例（方便測試類中直接使用self.driver）
-        request.instance.driver = driver  
-        yield driver  # 返回driver給測試函數使用
+        driver = create_driver(request, config)
+        # 仅在类用例时设置 request.instance.driver，函数用例跳过
+        if hasattr(request, 'instance') and request.instance is not None:
+            request.instance.driver = driver
+        yield driver
     finally:
-        if driver:  # 確保driver存在才執行退出
+        if driver:
             try:
-                driver.quit()  # 關閉瀏覽器
+                driver.quit()
             except Exception as e:
-                logging.error(f"关闭浏览器失败: {str(e)}")  # 記錄關閉失敗的錯誤
+                logging.error(f"关闭浏览器失败: {str(e)}")
                 
-@pytest.fixture(scope="function")  # 函數級別的fixture
+@pytest.fixture(scope="session")  # 优化为会话级别，所有用例共享同一driver实例
 def logged_in_driver(request, config):  # 接收request和config
     """
     已登录状态的浏览器夹具
@@ -157,34 +157,15 @@ def logged_in_driver(request, config):  # 接收request和config
         driver = create_driver(request, config)  
         # 根據命令行參數--env加載對應環境的配置（如UAT或QA環境的用戶名/密碼）
         env_config = ConfigManager.get_instance().get_env_config(request.config.getoption("--env"))  
-        
-        # 執行登錄操作
-        login_page = LoginPage(driver)  # 初始化登錄頁面對象
-        login_result = login_page.login(  # 調用登錄方法
-            env_config.get('username'),  # 從配置讀取用戶名
-            env_config.get('password')   # 從配置讀取密碼
-        )
-        
-        # 登錄失敗處理
+        login_page = LoginPage(driver)
+        login_result = login_page.login(env_config.get('username'), env_config.get('password'))
         if not login_result:
-            screenshot = safe_screenshot(driver, "login_failed")  # 截圖保存失敗場景
-            if screenshot:
-                allure.attach(  # 將截圖附加到Allure報告
-                    screenshot,
-                    name="login_failed",
-                    attachment_type=allure.attachment_type.PNG
-                )
-            pytest.fail("前置登录失败，无法继续测试")  # 主動標記測試失敗
-        
-        # 綁定driver並返回（與driver fixture相同）
-        request.instance.driver = driver  
-        yield driver  
+            pytest.fail("前置登录失败，无法继续测试")
+        request.instance.driver = driver
+        yield driver
     finally:
-        if driver:  # 關閉瀏覽器（與driver fixture相同）
-            try:
-                driver.quit()  
-            except Exception as e:
-                logging.error(f"关闭浏览器失败: {str(e)}")  
+        if driver:
+            driver.quit()
 
 @pytest.fixture(scope="class")
 def class_logged_in_driver(request, config):
@@ -207,6 +188,26 @@ def class_logged_in_driver(request, config):
             pytest.fail("前置登录失败，无法继续测试")
         # 绑定driver到测试类实例
         request.cls.driver = driver
+        yield driver
+    finally:
+        if driver:
+            driver.quit()
+
+@pytest.fixture(scope="session")
+def session_logged_in_driver(request, config):
+    """
+    会话级别的已登录状态浏览器夹具，所有用例文件共享同一driver和登录态
+    """
+    driver = None
+    try:
+        driver = create_driver(request, config)
+        env_config = ConfigManager.get_instance().get_env_config(request.config.getoption("--env"))
+        login_page = LoginPage(driver)
+        login_result = login_page.login(env_config.get('username'), env_config.get('password'))
+        if not login_result:
+            pytest.fail("前置登录失败，无法继续测试")
+        # 绑定driver到request.session，供不同文件共享
+        request.session.driver = driver
         yield driver
     finally:
         if driver:

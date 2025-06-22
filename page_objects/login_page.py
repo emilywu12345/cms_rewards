@@ -34,6 +34,7 @@ class LoginPage(BasePage):
                 self.take_screenshot("登录失败")
                 return False
             logger.info("登录成功")
+            self.take_screenshot("登录成功")
             return True
         except NoSuchElementException as e:
             logger.error(f'登录失败: 元素未找到 - {str(e)}')

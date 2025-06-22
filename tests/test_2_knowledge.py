@@ -8,7 +8,7 @@ from data.test_data import get_kb_create_data
 
 @allure.feature("知识库管理")
 # 使用类级别已登录driver夹具，保证本类所有用例共用同一浏览器会话，提升执行效率
-@pytest.mark.usefixtures("class_logged_in_driver")
+@pytest.mark.usefixtures("session_logged_in_driver")
 class TestKnowledge:
     """
     知识库相关自动化测试用例集。
@@ -16,13 +16,10 @@ class TestKnowledge:
     - 页面对象模式(POM)业务操作全部通过 KnowledgePage 实现，测试用例只负责业务流程和断言。
     - 用例结构清晰，便于维护和扩展。
     """
-    @pytest.fixture(autouse=True, scope="class")
-    def setup_class(self, class_logged_in_driver):
-        """
-        类级别 fixture,自动注入已登录的 driver。
-        driver 生命周期由 conftest.py 管理，页面对象只负责业务操作。
-        """
-        self.driver = class_logged_in_driver
+
+    @pytest.fixture(autouse=True)
+    def _inject_driver(self, session_logged_in_driver):
+        self.driver = session_logged_in_driver
 
     @allure.story("导航到知识库")
     @allure.description("验证用户能否成功進入知识库")
