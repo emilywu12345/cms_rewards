@@ -3,16 +3,16 @@
 # 环境配置
 environments:
   qa:  # QA测试环境
-    url: "http://192.168.101.65"
-    username: "admin2@cn.ey.com"
-    password: "mtyTWgJlFOqHfNyIbKZR"
-    api_base_url: "http://192.168.101.65/api"  # API基础URL
+    url: "https://admincms-sit-cicd.splusrewards.com.hk/"
+    username: "Mtel_QA"
+    password: "P@ssw0rd"
+    api_base_url: "https://admincms-sit-cicd.splusrewards.com.hk/api"  # API基础URL
   timeout: 30  # 环境特定超时设置
   uat:  # UAT测试环境
-    url: "https://aiportal.temvo.com/login"
-    username: "1062174229@qq.com"
-    password: "85516d29504949bc"
-    api_base_url: "https://aiportal.temvo.com/api"
+    url: "https://admincms-uat-cicd.splusrewards.com.hk/"
+    username: "Mtel_QA"
+    password: "P@ssw0rd"
+    api_base_url: "https://admincms-uat-cicd.splusrewards.com.hk/"
     timeout: 30
 
 # 浏览器配置

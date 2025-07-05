@@ -69,3 +69,22 @@ class BasePage:
         except Exception as e:
             logger.warning(f"等待 loading 遮罩消失超时: {str(e)}")
             return False
+            
+    def handle_exception(self, e, action_name=""):
+        """
+        统一处理页面操作异常
+        :param e: 异常对象
+        :param action_name: 操作名称
+        """
+        from selenium.common.exceptions import NoSuchElementException, TimeoutException
+        
+        if isinstance(e, NoSuchElementException):
+            logger.error(f'{action_name}失败: 元素未找到 - {str(e)}')
+            self.take_screenshot(f"{action_name}_元素未找到")
+        elif isinstance(e, TimeoutException):
+            logger.error(f'{action_name}失败: 等待元素超时 - {str(e)}')
+            self.take_screenshot(f"{action_name}_等待元素超时")
+        else:
+            logger.error(f"{action_name}失败: 发生未知异常 - {str(e)}")
+            self.take_screenshot(f"{action_name}_发生未知异常")
+        return False
