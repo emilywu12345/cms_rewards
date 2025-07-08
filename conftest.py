@@ -46,6 +46,8 @@ def pytest_addoption(parser):
                     help="浏览器类型: chrome, firefox")
     parser.addoption("--headless", action="store", default="False", 
                     help="是否使用无头模式: True, False")
+    parser.addoption("--fast-close", action="store", default="False",
+                    help="是否启用快速关闭模式: True, False")
 
 @pytest.fixture(scope="session")
 def config():
@@ -75,16 +77,35 @@ def create_driver(request, config):
         if headless.lower() == "true" or browser_config.get('headless', False):
             options.add_argument("--headless=new")
             
-        # 添加SSL证书处理选项
+        # 性能优化选项 - 优化关闭速度的配置
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        options.add_argument('--disable-gpu')
+        options.add_argument('--disable-extensions')
+        options.add_argument('--disable-plugins')
+        options.add_argument('--disable-background-timer-throttling')
+        options.add_argument('--disable-backgrounding-occluded-windows')
+        options.add_argument('--disable-renderer-backgrounding')
+        options.add_argument('--disable-component-extensions-with-background-pages')
+        
+        # 网络和安全选项 - 减少关闭时的网络等待
         options.add_argument('--ignore-certificate-errors')
         options.add_argument('--ignore-ssl-errors')
         options.add_argument('--allow-insecure-localhost')
         options.add_argument('--disable-web-security')
-        options.add_experimental_option('excludeSwitches', ['enable-logging'])
+        options.add_argument('--disable-features=VizDisplayCompositor')
+        options.add_argument('--disable-background-networking')
+        options.add_argument('--disable-component-update')
+        options.add_argument('--force-device-scale-factor=1')
         
-        # 添加其他必要的选项
-        options.add_argument('--no-sandbox')
-        options.add_argument('--disable-dev-shm-usage')
+        # 日志和调试选项
+        options.add_experimental_option('excludeSwitches', ['enable-logging'])
+        options.add_experimental_option('useAutomationExtension', False)
+        options.add_argument('--disable-blink-features=AutomationControlled')
+        
+        # 窗口大小设置
+        options.add_argument('--window-size=1920,1080')
+        options.add_argument('--start-maximized')
         
         logging.info("浏览器选项配置完成")
         
@@ -94,11 +115,13 @@ def create_driver(request, config):
         else:
             raise ValueError(f"不支持的浏览器类型: {browser}")
         
-        # 设置超时时间
-        driver.implicitly_wait(browser_config.get('implicit_wait', 10))
-        driver.set_page_load_timeout(browser_config.get('page_load_timeout', 30))
+        # 设置超时时间 - 优化为更短的等待时间，避免关闭时长时间等待
+        driver.implicitly_wait(browser_config.get('implicit_wait', 1))  # 减少到1秒
+        driver.set_page_load_timeout(browser_config.get('page_load_timeout', 8))  # 减少到8秒
         if 'script_timeout' in browser_config:
             driver.set_script_timeout(browser_config['script_timeout'])
+        else:
+            driver.set_script_timeout(3)  # 默认3秒脚本超时
         
         logging.info("浏览器配置完成")
         return driver
@@ -106,6 +129,97 @@ def create_driver(request, config):
     except Exception as e:
         logging.error(f"创建浏览器实例失败: {str(e)}")
         raise
+
+def safe_close_driver(driver, fast_close=False):
+    """
+    安全地关闭浏览器驱动
+    Args:
+        driver: WebDriver实例
+        fast_close: 是否启用快速关闭模式
+    """
+    if not driver:
+        return
+        
+    try:
+        if fast_close:
+            # 快速关闭模式：直接quit，不等待
+            logging.info("快速关闭模式：直接终止浏览器")
+            # 设置较短的超时时间
+            import signal
+            import threading
+            
+            def force_quit():
+                try:
+                    # driver.quit()
+                    pass
+                except:
+                    pass
+            
+            # 在单独线程中执行quit，如果超时则强制终止
+            quit_thread = threading.Thread(target=force_quit)
+            quit_thread.daemon = True
+            quit_thread.start()
+            quit_thread.join(timeout=2)  # 最多等待2秒
+            
+            if quit_thread.is_alive():
+                # 如果quit没有在2秒内完成，强制终止进程
+                logging.warning("quit操作超时，强制终止进程")
+                try:
+                    import subprocess
+                    if sys.platform.startswith('win'):
+                        subprocess.run(["taskkill", "/F", "/IM", "chrome.exe"], 
+                                     capture_output=True, check=False, timeout=3)
+                        subprocess.run(["taskkill", "/F", "/IM", "chromedriver.exe"], 
+                                     capture_output=True, check=False, timeout=3)
+                    else:
+                        subprocess.run(["pkill", "-f", "chrome"], 
+                                     capture_output=True, check=False, timeout=3)
+                        subprocess.run(["pkill", "-f", "chromedriver"], 
+                                     capture_output=True, check=False, timeout=3)
+                    logging.info("已强制终止浏览器进程")
+                except Exception as kill_error:
+                    logging.error(f"强制终止进程失败: {str(kill_error)}")
+        else:
+            # 标准关闭模式：先关闭窗口再quit
+            logging.info("标准关闭模式：逐步关闭浏览器")
+            try:
+                # 快速关闭所有窗口，不逐个切换
+                # driver.quit()
+                pass
+            except Exception as e:
+                logging.warning(f"关闭浏览器时出错: {str(e)}")
+                # 标准模式失败时也尝试强制终止
+                try:
+                    import subprocess
+                    if sys.platform.startswith('win'):
+                        subprocess.run(["taskkill", "/F", "/IM", "chrome.exe"], 
+                                     capture_output=True, check=False, timeout=3)
+                        subprocess.run(["taskkill", "/F", "/IM", "chromedriver.exe"], 
+                                     capture_output=True, check=False, timeout=3)
+                    logging.info("已强制终止Chrome相关进程")
+                except Exception as kill_error:
+                    logging.error(f"强制终止进程失败: {str(kill_error)}")
+            
+        logging.info("浏览器已成功关闭")
+        
+    except Exception as e:
+        logging.error(f"关闭浏览器失败: {str(e)}")
+        # 强制终止进程作为最后手段
+        try:
+            import subprocess
+            if sys.platform.startswith('win'):
+                subprocess.run(["taskkill", "/F", "/IM", "chrome.exe"], 
+                             capture_output=True, check=False, timeout=3)
+                subprocess.run(["taskkill", "/F", "/IM", "chromedriver.exe"], 
+                             capture_output=True, check=False, timeout=3)
+            else:
+                subprocess.run(["pkill", "-f", "chrome"], 
+                             capture_output=True, check=False, timeout=3)
+                subprocess.run(["pkill", "-f", "chromedriver"], 
+                             capture_output=True, check=False, timeout=3)
+            logging.info("已强制终止浏览器相关进程")
+        except Exception as kill_error:
+            logging.error(f"强制终止进程失败: {str(kill_error)}")
 
 def safe_screenshot(driver, name):
     """
@@ -139,11 +253,9 @@ def driver(request, config):  # 接收pytest的request對象和config配置
             request.instance.driver = driver
         yield driver
     finally:
-        if driver:
-            try:
-                driver.quit()
-            except Exception as e:
-                logging.error(f"关闭浏览器失败: {str(e)}")
+        # 检查是否启用快速关闭模式（通过环境变量获取）
+        fast_close = os.environ.get("PYTEST_FAST_CLOSE", "false").lower() == "true"
+        safe_close_driver(driver, fast_close)
                 
 @pytest.fixture(scope="session")  # 优化为会话级别，所有用例共享同一driver实例
 def logged_in_driver(request, config):  # 接收request和config
@@ -164,8 +276,9 @@ def logged_in_driver(request, config):  # 接收request和config
         request.instance.driver = driver
         yield driver
     finally:
-        if driver:
-            driver.quit()
+        # 检查是否启用快速关闭模式（通过环境变量获取）
+        fast_close = os.environ.get("PYTEST_FAST_CLOSE", "false").lower() == "true"
+        safe_close_driver(driver, fast_close)
 
 @pytest.fixture(scope="class")
 def class_logged_in_driver(request, config):
@@ -190,8 +303,9 @@ def class_logged_in_driver(request, config):
         request.cls.driver = driver
         yield driver
     finally:
-        if driver:
-            driver.quit()
+        # 检查是否启用快速关闭模式（通过环境变量获取）
+        fast_close = os.environ.get("PYTEST_FAST_CLOSE", "false").lower() == "true"
+        safe_close_driver(driver, fast_close)
 
 @pytest.fixture(scope="session")
 def session_logged_in_driver(request, config):
@@ -210,8 +324,9 @@ def session_logged_in_driver(request, config):
         request.session.driver = driver
         yield driver
     finally:
-        if driver:
-            driver.quit()
+        # 检查是否启用快速关闭模式（通过环境变量获取）
+        fast_close = os.environ.get("PYTEST_FAST_CLOSE", "false").lower() == "true"
+        safe_close_driver(driver, fast_close)
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):

@@ -1,5 +1,8 @@
 # Web UI 自动化测试配置文件
 
+# 默认环境设置
+default_env: "uat"
+
 # 环境配置
 environments:
   qa:  # QA测试环境
@@ -7,21 +10,21 @@ environments:
     username: "Mtel_QA"
     password: "P@ssw0rd"
     api_base_url: "https://admincms-sit-cicd.splusrewards.com.hk/api"  # API基础URL
-  timeout: 30  # 环境特定超时设置
+    timeout: 10  # 环境特定超时设置
   uat:  # UAT测试环境
     url: "https://admincms-uat-cicd.splusrewards.com.hk/"
     username: "Mtel_QA"
     password: "P@ssw0rd"
     api_base_url: "https://admincms-uat-cicd.splusrewards.com.hk/"
-    timeout: 30
+    timeout: 10
 
 # 浏览器配置
 browser:
   type: "chrome"  # 支持 chrome, firefox, edge
   headless: false  # 是否启用无头模式
-  implicit_wait: 10  # 隐式等待时间(秒)
-  page_load_timeout: 30  # 页面加载超时时间(秒)
-  script_timeout: 30  # 脚本执行超时时间(秒)
+  implicit_wait: 3  # 隐式等待时间(秒) - 优化为3秒
+  page_load_timeout: 15  # 页面加载超时时间(秒) - 优化为15秒
+  script_timeout: 10  # 脚本执行超时时间(秒) - 优化为10秒
   screenshot_on_failure: true  # 失败时是否自动截图
   capabilities:
     browserName: "chrome"
@@ -46,9 +49,9 @@ test:
   screenshot_dir: "screenshots"  # 截图保存目录
   log_level: "INFO"  # 日志级别
   wait:  # 等待时间配置
-    short: 5  # 短等待(秒)
-    medium: 10  # 中等等待(秒)
-    long: 30  # 长等待(秒)
+    short: 2  # 短等待(秒) - 优化为2秒
+    medium: 5  # 中等等待(秒) - 优化为5秒
+    long: 15  # 长等待(秒) - 优化为15秒
 
 # 报告配置
 report:

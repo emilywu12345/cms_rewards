@@ -1,6 +1,7 @@
 import logging
 import os
 from datetime import datetime
+from logging.handlers import RotatingFileHandler
 from typing import Optional
 
 
@@ -38,7 +39,10 @@ class LogManager:
             self._logger.setLevel(logging.INFO)
             
             # 文件处理器
-            file_handler = logging.FileHandler(log_file, encoding="utf-8")
+            # 使用轮转日志处理器，限制单个文件大小为5MB，最多保留3个备份
+            file_handler = RotatingFileHandler(
+                log_file, encoding="utf-8", maxBytes=5*1024*1024, backupCount=3
+            )
             file_handler.setLevel(logging.INFO)
             
             # 控制台处理器
@@ -49,6 +53,10 @@ class LogManager:
             formatter = logging.Formatter(
                 "%(asctime)s - %(levelname)s - %(message)s",
                 datefmt="%Y-%m-%d %H:%M:%S"
+            )
+            # 添加日志来源信息
+            formatter = logging.Formatter(
+                "%(asctime)s - %(name)s - %(levelname)s - %(module)s:%(lineno)d - %(message)s",
             )
             
             file_handler.setFormatter(formatter)
