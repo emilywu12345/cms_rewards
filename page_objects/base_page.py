@@ -4,7 +4,8 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from utils.log_manager import logger
 from utils.config_manager import ConfigManager
-
+from datetime import datetime
+import time
 
 class BasePage:
     def __init__(self, driver):
@@ -123,3 +124,42 @@ class BasePage:
             logger.error(f"{error_msg}: 发生未知异常 - {str(e)}")
             self.take_screenshot(f"{action_name}_发生未知异常")
         return False
+    
+    def set_form_value(self, value, type):
+        """
+        设置表单字段的值
+        :param value: 要设置的值
+        :param type: 字段类型
+        """
+        try:
+            if(type == 'RangePicker'):
+                logger.info("设置 RangePicker 日期范围: %s", value)
+                # 先点击日期选择器图标激活组件
+                SHOWING_DATE_ICON = (By.XPATH, "//span[@id='showingDate']//i[contains(@class, 'ant-calendar-picker-icon')]")
+                self.driver.find_element(*SHOWING_DATE_ICON).click()
+                # 等待日期选择器激活
+                time.sleep(2)
+
+                # 後期優化 -----------
+                start_date = value[0]
+                end_date = value[1]  
+
+                # 解析为 datetime 对象（注意格式匹配）
+                start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
+                end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
+
+                # 格式化为目标字符串 (Windows兼容格式)
+                start_date_formatted_date = start_date_obj.strftime("%B %d, %Y").replace(' 0', ' ')
+                end_date_formatted_date = end_date_obj.strftime("%B %d, %Y").replace(' 0', ' ')
+
+                logger.info(f"设置 RangePicker 日期范围: {start_date_formatted_date} - {end_date_formatted_date}")
+                START_DATE_BUTTON = (By.XPATH, "//table[@class='ant-calendar-table']//td[contains(@title, '" + start_date_formatted_date + "')]")
+                END_DATE_BUTTON = (By.XPATH, "//table[@class='ant-calendar-table']//td[contains(@title, '" + end_date_formatted_date + "')]")
+
+                logger.info(f"点击开始日期按钮: {START_DATE_BUTTON}, 结束日期按钮: {END_DATE_BUTTON}")
+                self.driver.find_element(*START_DATE_BUTTON).click()
+                self.driver.find_element(*END_DATE_BUTTON).click()
+            return True
+        except Exception as e:
+            self.handle_exception(e, f"设置{type}值")
+            return False

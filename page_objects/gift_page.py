@@ -8,6 +8,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+
 # 添加项目根目录到 Python 路径，以支持独立运行
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(current_dir)
@@ -155,394 +156,365 @@ class GiftPage(BasePage):
             # 使用优化的日期设置方法
             # self._set_date_fields_optimized()
 
-            # 1. 定位开始日期输入框（placeholder="Start date"）
-            # start_element = self.driver.find_element(
+            current_date = datetime.now().strftime("%Y-%m-%d")
+            self.set_form_value([current_date, current_date], 'RangePicker')
+
+            # # 先点击日期选择器图标激活组件
+            # self.find_element(self.SHOWING_DATE_ICON).click()
+            # # 等待日期选择器激活
+            # time.sleep(2)  
+            
+            # # 设置showingDate开始日期
+            # showing_start_element = self.driver.find_element(
             #     By.XPATH, 
-            #     "//input[contains(@class, 'ant-calendar-range-picker-input') and @placeholder='Start date']"
+            #     "//span[@id='showingDate']//input[contains(@class, 'ant-calendar-range-picker-input') and @placeholder='Start date']"
             # )
-            # # 赋值开始日期
-            # self.driver.execute_script(
-            #     "arguments[0].value = '2025-07-08 12:00:00';", 
-            #     start_element
-            # )
-            # self.driver.execute_script(
-            #     "arguments[0].dispatchEvent(new Event('change'));", 
-            #     start_element
-            # )
+            
+            # # 使用更强化的JavaScript设置方法，彻底防止清空
+            # self.driver.execute_script("""
+            #     var input = arguments[0];
+            #     var value = arguments[1];
+                
+            #     console.log('开始设置日期:', value);
+                
+            #     // 强制移除所有限制属性
+            #     input.removeAttribute('readonly');
+            #     input.removeAttribute('disabled');
+            #     input.style.pointerEvents = 'auto';
+                
+            #     // 强制聚焦
+            #     input.focus();
+            #     input.click();
+                
+            #     // 清空当前值
+            #     input.value = '';
+            #     input.defaultValue = '';
+                
+            #     // 设置新值
+            #     input.value = value;
+            #     input.defaultValue = value;
+                
+            #     // 立即触发所有可能的事件
+            #     var events = ['focus', 'input', 'change', 'keydown', 'keyup', 'blur'];
+            #     events.forEach(function(eventType) {
+            #         var event = new Event(eventType, {
+            #             bubbles: true, 
+            #             cancelable: true,
+            #             view: window
+            #         });
+            #         input.dispatchEvent(event);
+            #     });
+                
+            #     // 特别处理React组件
+            #     if (input._reactInternalFiber || input._reactInternalInstance || input.__reactInternalInstance) {
+            #         // 触发React onChange
+            #         var nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
+            #         nativeInputValueSetter.call(input, value);
+                    
+            #         var reactEvent = new Event('input', { bubbles: true });
+            #         input.dispatchEvent(reactEvent);
+            #     }
+                
+            #     // 设置多重备用属性
+            #     input.setAttribute('data-value', value);
+            #     input.setAttribute('title', value);
+            #     input.setAttribute('aria-valuenow', value);
+                
+            #     // 防止组件重新渲染时清空
+            #     Object.defineProperty(input, 'value', {
+            #         get: function() { return value; },
+            #         set: function(newValue) { 
+            #             if (newValue !== value && newValue !== '') {
+            #                 this.setAttribute('value', newValue);
+            #             }
+            #         }
+            #     });
+                
+            #     console.log('日期设置完成:', input.value);
+            #     return true;
+            # """, showing_start_element, "2025-07-08")
 
-            # # 定位结束日期输入框（placeholder="End date"）
-            # end_element = self.driver.find_element(
+            # time.sleep(2)  # 等待设置完成
+            
+            # # 设置showingDate结束日期
+            # showing_end_element = self.driver.find_element(
             #     By.XPATH, 
-            #     "//input[contains(@class, 'ant-calendar-range-picker-input') and @placeholder='End date']"
+            #     "//span[@id='showingDate']//input[contains(@class, 'ant-calendar-range-picker-input') and @placeholder='End date']"
             # )
-            # # 赋值结束日期（示例：比开始日期晚 1 小时）
-            # self.driver.execute_script(
-            #     "arguments[0].value = '2025-07-08 13:00:00';", 
-            #     end_element
+            
+            # # 使用相同的强化方法设置结束日期
+            # self.driver.execute_script("""
+            #     var input = arguments[0];
+            #     var value = arguments[1];
+                
+            #     console.log('开始设置结束日期:', value);
+                
+            #     input.removeAttribute('readonly');
+            #     input.removeAttribute('disabled');
+            #     input.style.pointerEvents = 'auto';
+                
+            #     input.focus();
+            #     input.click();
+                
+            #     input.value = '';
+            #     input.defaultValue = '';
+                
+            #     input.value = value;
+            #     input.defaultValue = value;
+                
+            #     var events = ['focus', 'input', 'change', 'keydown', 'keyup', 'blur'];
+            #     events.forEach(function(eventType) {
+            #         var event = new Event(eventType, {
+            #             bubbles: true, 
+            #             cancelable: true,
+            #             view: window
+            #         });
+            #         input.dispatchEvent(event);
+            #     });
+                
+            #     if (input._reactInternalFiber || input._reactInternalInstance || input.__reactInternalInstance) {
+            #         var nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
+            #         nativeInputValueSetter.call(input, value);
+                    
+            #         var reactEvent = new Event('input', { bubbles: true });
+            #         input.dispatchEvent(reactEvent);
+            #     }
+                
+            #     input.setAttribute('data-value', value);
+            #     input.setAttribute('title', value);
+            #     input.setAttribute('aria-valuenow', value);
+                
+            #     Object.defineProperty(input, 'value', {
+            #         get: function() { return value; },
+            #         set: function(newValue) { 
+            #             if (newValue !== value && newValue !== '') {
+            #                 this.setAttribute('value', newValue);
+            #             }
+            #         }
+            #     });
+                
+            #     console.log('结束日期设置完成:', input.value);
+            #     return true;
+            # """, showing_end_element, "2025-07-09")
+
+            # time.sleep(2)  # 等待设置完成
+            
+            # # 点击页面其他地方关闭日期选择器
+            # self.driver.find_element(By.TAG_NAME, "body").click()
+            # time.sleep(1)
+            
+
+            # # 设置Redemption Date开始日期
+            # redemption_start_element = self.driver.find_element(
+            #     By.XPATH, 
+            #     "//span[@id='reservationDate']//input[contains(@class, 'ant-calendar-range-picker-input') and @placeholder='Start date']"
             # )
-            # self.driver.execute_script(
-            #     "arguments[0].dispatchEvent(new Event('change'));", 
-            #     end_element
+            
+            # # 使用更强化的JavaScript设置方法，彻底防止清空
+            # self.driver.execute_script("""
+            #     var input = arguments[0];
+            #     var value = arguments[1];
+                
+            #     console.log('开始设置日期:', value);
+                
+            #     // 强制移除所有限制属性
+            #     input.removeAttribute('readonly');
+            #     input.removeAttribute('disabled');
+            #     input.style.pointerEvents = 'auto';
+                
+            #     // 强制聚焦
+            #     input.focus();
+            #     input.click();
+                
+            #     // 清空当前值
+            #     input.value = '';
+            #     input.defaultValue = '';
+                
+            #     // 设置新值
+            #     input.value = value;
+            #     input.defaultValue = value;
+                
+            #     // 立即触发所有可能的事件
+            #     var events = ['focus', 'input', 'change', 'keydown', 'keyup', 'blur'];
+            #     events.forEach(function(eventType) {
+            #         var event = new Event(eventType, {
+            #             bubbles: true, 
+            #             cancelable: true,
+            #             view: window
+            #         });
+            #         input.dispatchEvent(event);
+            #     });
+                
+            #     // 特别处理React组件
+            #     if (input._reactInternalFiber || input._reactInternalInstance || input.__reactInternalInstance) {
+            #         // 触发React onChange
+            #         var nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
+            #         nativeInputValueSetter.call(input, value);
+                    
+            #         var reactEvent = new Event('input', { bubbles: true });
+            #         input.dispatchEvent(reactEvent);
+            #     }
+                
+            #     // 设置多重备用属性
+            #     input.setAttribute('data-value', value);
+            #     input.setAttribute('title', value);
+            #     input.setAttribute('aria-valuenow', value);
+                
+            #     // 防止组件重新渲染时清空
+            #     Object.defineProperty(input, 'value', {
+            #         get: function() { return value; },
+            #         set: function(newValue) { 
+            #             if (newValue !== value && newValue !== '') {
+            #                 this.setAttribute('value', newValue);
+            #             }
+            #         }
+            #     });
+                
+            #     console.log('日期设置完成:', input.value);
+            #     return true;
+            # """, redemption_start_element, "2025-07-08")
+            
+            # time.sleep(2)  # 等待设置完成
+
+            # # 设置Redemption Date结束日期
+            # redemption_end_element = self.driver.find_element(
+            #     By.XPATH, 
+            #     "//span[@id='reservationDate']//input[contains(@class, 'ant-calendar-range-picker-input') and @placeholder='End date']"
             # )
-
-
-
-            # 优化的日期设置方法 - 解决清空问题
-            # 先点击日期选择器图标激活组件
-            self.find_element(self.SHOWING_DATE_ICON).click()
-            time.sleep(2)  # 等待日期选择器激活
             
-            # 设置showingDate开始日期
-            start_element = self.driver.find_element(
-                By.XPATH, 
-                "//span[@id='showingDate']//input[contains(@class, 'ant-calendar-range-picker-input') and @placeholder='Start date']"
-            )
-            
-            # 使用更强化的JavaScript设置方法，彻底防止清空
-            self.driver.execute_script("""
-                var input = arguments[0];
-                var value = arguments[1];
+            # # 使用相同的强化方法设置结束日期
+            # self.driver.execute_script("""
+            #     var input = arguments[0];
+            #     var value = arguments[1];
                 
-                console.log('开始设置日期:', value);
+            #     console.log('开始设置结束日期:', value);
                 
-                // 强制移除所有限制属性
-                input.removeAttribute('readonly');
-                input.removeAttribute('disabled');
-                input.style.pointerEvents = 'auto';
+            #     input.removeAttribute('readonly');
+            #     input.removeAttribute('disabled');
+            #     input.style.pointerEvents = 'auto';
                 
-                // 强制聚焦
-                input.focus();
-                input.click();
+            #     input.focus();
+            #     input.click();
                 
-                // 清空当前值
-                input.value = '';
-                input.defaultValue = '';
+            #     input.value = '';
+            #     input.defaultValue = '';
                 
-                // 设置新值
-                input.value = value;
-                input.defaultValue = value;
+            #     input.value = value;
+            #     input.defaultValue = value;
                 
-                // 立即触发所有可能的事件
-                var events = ['focus', 'input', 'change', 'keydown', 'keyup', 'blur'];
-                events.forEach(function(eventType) {
-                    var event = new Event(eventType, {
-                        bubbles: true, 
-                        cancelable: true,
-                        view: window
-                    });
-                    input.dispatchEvent(event);
-                });
+            #     var events = ['focus', 'input', 'change', 'keydown', 'keyup', 'blur'];
+            #     events.forEach(function(eventType) {
+            #         var event = new Event(eventType, {
+            #             bubbles: true, 
+            #             cancelable: true,
+            #             view: window
+            #         });
+            #         input.dispatchEvent(event);
+            #     });
                 
-                // 特别处理React组件
-                if (input._reactInternalFiber || input._reactInternalInstance || input.__reactInternalInstance) {
-                    // 触发React onChange
-                    var nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
-                    nativeInputValueSetter.call(input, value);
+            #     if (input._reactInternalFiber || input._reactInternalInstance || input.__reactInternalInstance) {
+            #         var nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
+            #         nativeInputValueSetter.call(input, value);
                     
-                    var reactEvent = new Event('input', { bubbles: true });
-                    input.dispatchEvent(reactEvent);
-                }
+            #         var reactEvent = new Event('input', { bubbles: true });
+            #         input.dispatchEvent(reactEvent);
+            #     }
                 
-                // 设置多重备用属性
-                input.setAttribute('data-value', value);
-                input.setAttribute('title', value);
-                input.setAttribute('aria-valuenow', value);
+            #     input.setAttribute('data-value', value);
+            #     input.setAttribute('title', value);
+            #     input.setAttribute('aria-valuenow', value);
                 
-                // 防止组件重新渲染时清空
-                Object.defineProperty(input, 'value', {
-                    get: function() { return value; },
-                    set: function(newValue) { 
-                        if (newValue !== value && newValue !== '') {
-                            this.setAttribute('value', newValue);
-                        }
-                    }
-                });
+            #     Object.defineProperty(input, 'value', {
+            #         get: function() { return value; },
+            #         set: function(newValue) { 
+            #             if (newValue !== value && newValue !== '') {
+            #                 this.setAttribute('value', newValue);
+            #             }
+            #         }
+            #     });
                 
-                console.log('日期设置完成:', input.value);
-                return true;
-            """, start_element, "2025-07-08")
+            #     console.log('结束日期设置完成:', input.value);
+            #     return true;
+            # """, redemption_end_element, "2025-07-09")
+
+
+            # # 点击页面其他地方关闭日期选择器
+            # self.driver.find_element(By.TAG_NAME, "body").click()
+            # time.sleep(1)
+
+
+            # # 设置Expiry Date开始日期
+            # expiry_element = self.driver.find_element(
+            #     By.XPATH, 
+            #     "//span[@id='expiryDate']//input[contains(@class, 'ant-calendar-picker')]"
+            # )
             
-            time.sleep(2)  # 等待设置完成
-            
-            # 设置showingDate结束日期
-            end_element = self.driver.find_element(
-                By.XPATH, 
-                "//span[@id='showingDate']//input[contains(@class, 'ant-calendar-range-picker-input') and @placeholder='End date']"
-            )
-            
-            # 使用相同的强化方法设置结束日期
-            self.driver.execute_script("""
-                var input = arguments[0];
-                var value = arguments[1];
+            # # 使用更强化的JavaScript设置方法，彻底防止清空
+            # self.driver.execute_script("""
+            #     var input = arguments[0];
+            #     var value = arguments[1];
                 
-                console.log('开始设置结束日期:', value);
+            #     console.log('开始设置日期:', value);
                 
-                input.removeAttribute('readonly');
-                input.removeAttribute('disabled');
-                input.style.pointerEvents = 'auto';
+            #     // 强制移除所有限制属性
+            #     input.removeAttribute('readonly');
+            #     input.removeAttribute('disabled');
+            #     input.style.pointerEvents = 'auto';
                 
-                input.focus();
-                input.click();
+            #     // 强制聚焦
+            #     input.focus();
+            #     input.click();
                 
-                input.value = '';
-                input.defaultValue = '';
+            #     // 清空当前值
+            #     input.value = '';
+            #     input.defaultValue = '';
                 
-                input.value = value;
-                input.defaultValue = value;
+            #     // 设置新值
+            #     input.value = value;
+            #     input.defaultValue = value;
                 
-                var events = ['focus', 'input', 'change', 'keydown', 'keyup', 'blur'];
-                events.forEach(function(eventType) {
-                    var event = new Event(eventType, {
-                        bubbles: true, 
-                        cancelable: true,
-                        view: window
-                    });
-                    input.dispatchEvent(event);
-                });
+            #     // 立即触发所有可能的事件
+            #     var events = ['focus', 'input', 'change', 'keydown', 'keyup', 'blur'];
+            #     events.forEach(function(eventType) {
+            #         var event = new Event(eventType, {
+            #             bubbles: true, 
+            #             cancelable: true,
+            #             view: window
+            #         });
+            #         input.dispatchEvent(event);
+            #     });
                 
-                if (input._reactInternalFiber || input._reactInternalInstance || input.__reactInternalInstance) {
-                    var nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
-                    nativeInputValueSetter.call(input, value);
+            #     // 特别处理React组件
+            #     if (input._reactInternalFiber || input._reactInternalInstance || input.__reactInternalInstance) {
+            #         // 触发React onChange
+            #         var nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
+            #         nativeInputValueSetter.call(input, value);
                     
-                    var reactEvent = new Event('input', { bubbles: true });
-                    input.dispatchEvent(reactEvent);
-                }
+            #         var reactEvent = new Event('input', { bubbles: true });
+            #         input.dispatchEvent(reactEvent);
+            #     }
                 
-                input.setAttribute('data-value', value);
-                input.setAttribute('title', value);
-                input.setAttribute('aria-valuenow', value);
+            #     // 设置多重备用属性
+            #     input.setAttribute('data-value', value);
+            #     input.setAttribute('title', value);
+            #     input.setAttribute('aria-valuenow', value);
                 
-                Object.defineProperty(input, 'value', {
-                    get: function() { return value; },
-                    set: function(newValue) { 
-                        if (newValue !== value && newValue !== '') {
-                            this.setAttribute('value', newValue);
-                        }
-                    }
-                });
+            #     // 防止组件重新渲染时清空
+            #     Object.defineProperty(input, 'value', {
+            #         get: function() { return value; },
+            #         set: function(newValue) { 
+            #             if (newValue !== value && newValue !== '') {
+            #                 this.setAttribute('value', newValue);
+            #             }
+            #         }
+            #     });
                 
-                console.log('结束日期设置完成:', input.value);
-                return true;
-            """, end_element, "2025-07-09")
-
-            time.sleep(2)  # 等待设置完成
-            
-            # 点击页面其他地方关闭日期选择器
-            self.driver.find_element(By.TAG_NAME, "body").click()
-            time.sleep(1)
-            
-
-            # 设置Redemption Date开始日期
-            start_element = self.driver.find_element(
-                By.XPATH, 
-                "//span[@id='reservationDate']//input[contains(@class, 'ant-calendar-range-picker-input') and @placeholder='Start date']"
-            )
-            
-            # 使用更强化的JavaScript设置方法，彻底防止清空
-            self.driver.execute_script("""
-                var input = arguments[0];
-                var value = arguments[1];
-                
-                console.log('开始设置日期:', value);
-                
-                // 强制移除所有限制属性
-                input.removeAttribute('readonly');
-                input.removeAttribute('disabled');
-                input.style.pointerEvents = 'auto';
-                
-                // 强制聚焦
-                input.focus();
-                input.click();
-                
-                // 清空当前值
-                input.value = '';
-                input.defaultValue = '';
-                
-                // 设置新值
-                input.value = value;
-                input.defaultValue = value;
-                
-                // 立即触发所有可能的事件
-                var events = ['focus', 'input', 'change', 'keydown', 'keyup', 'blur'];
-                events.forEach(function(eventType) {
-                    var event = new Event(eventType, {
-                        bubbles: true, 
-                        cancelable: true,
-                        view: window
-                    });
-                    input.dispatchEvent(event);
-                });
-                
-                // 特别处理React组件
-                if (input._reactInternalFiber || input._reactInternalInstance || input.__reactInternalInstance) {
-                    // 触发React onChange
-                    var nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
-                    nativeInputValueSetter.call(input, value);
-                    
-                    var reactEvent = new Event('input', { bubbles: true });
-                    input.dispatchEvent(reactEvent);
-                }
-                
-                // 设置多重备用属性
-                input.setAttribute('data-value', value);
-                input.setAttribute('title', value);
-                input.setAttribute('aria-valuenow', value);
-                
-                // 防止组件重新渲染时清空
-                Object.defineProperty(input, 'value', {
-                    get: function() { return value; },
-                    set: function(newValue) { 
-                        if (newValue !== value && newValue !== '') {
-                            this.setAttribute('value', newValue);
-                        }
-                    }
-                });
-                
-                console.log('日期设置完成:', input.value);
-                return true;
-            """, start_element, "2025-07-08")
-            
-            time.sleep(2)  # 等待设置完成
-
-            # 设置Redemption Date结束日期
-            end_element = self.driver.find_element(
-                By.XPATH, 
-                "//span[@id='reservationDate']//input[contains(@class, 'ant-calendar-range-picker-input') and @placeholder='End date']"
-            )
-            
-            # 使用相同的强化方法设置结束日期
-            self.driver.execute_script("""
-                var input = arguments[0];
-                var value = arguments[1];
-                
-                console.log('开始设置结束日期:', value);
-                
-                input.removeAttribute('readonly');
-                input.removeAttribute('disabled');
-                input.style.pointerEvents = 'auto';
-                
-                input.focus();
-                input.click();
-                
-                input.value = '';
-                input.defaultValue = '';
-                
-                input.value = value;
-                input.defaultValue = value;
-                
-                var events = ['focus', 'input', 'change', 'keydown', 'keyup', 'blur'];
-                events.forEach(function(eventType) {
-                    var event = new Event(eventType, {
-                        bubbles: true, 
-                        cancelable: true,
-                        view: window
-                    });
-                    input.dispatchEvent(event);
-                });
-                
-                if (input._reactInternalFiber || input._reactInternalInstance || input.__reactInternalInstance) {
-                    var nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
-                    nativeInputValueSetter.call(input, value);
-                    
-                    var reactEvent = new Event('input', { bubbles: true });
-                    input.dispatchEvent(reactEvent);
-                }
-                
-                input.setAttribute('data-value', value);
-                input.setAttribute('title', value);
-                input.setAttribute('aria-valuenow', value);
-                
-                Object.defineProperty(input, 'value', {
-                    get: function() { return value; },
-                    set: function(newValue) { 
-                        if (newValue !== value && newValue !== '') {
-                            this.setAttribute('value', newValue);
-                        }
-                    }
-                });
-                
-                console.log('结束日期设置完成:', input.value);
-                return true;
-            """, end_element, "2025-07-09")
+            #     console.log('日期设置完成:', input.value);
+            #     return true;
+            # """, expiry_element, "2025-07-30")
 
 
-            # 点击页面其他地方关闭日期选择器
-            self.driver.find_element(By.TAG_NAME, "body").click()
-            time.sleep(1)
 
-
-            # 设置Expiry Date开始日期
-            start_element = self.driver.find_element(
-                By.XPATH, 
-                "//span[@id='expiryDate']//input[contains(@class, 'ant-calendar-picker')]"
-            )
-            
-            # 使用更强化的JavaScript设置方法，彻底防止清空
-            self.driver.execute_script("""
-                var input = arguments[0];
-                var value = arguments[1];
-                
-                console.log('开始设置日期:', value);
-                
-                // 强制移除所有限制属性
-                input.removeAttribute('readonly');
-                input.removeAttribute('disabled');
-                input.style.pointerEvents = 'auto';
-                
-                // 强制聚焦
-                input.focus();
-                input.click();
-                
-                // 清空当前值
-                input.value = '';
-                input.defaultValue = '';
-                
-                // 设置新值
-                input.value = value;
-                input.defaultValue = value;
-                
-                // 立即触发所有可能的事件
-                var events = ['focus', 'input', 'change', 'keydown', 'keyup', 'blur'];
-                events.forEach(function(eventType) {
-                    var event = new Event(eventType, {
-                        bubbles: true, 
-                        cancelable: true,
-                        view: window
-                    });
-                    input.dispatchEvent(event);
-                });
-                
-                // 特别处理React组件
-                if (input._reactInternalFiber || input._reactInternalInstance || input.__reactInternalInstance) {
-                    // 触发React onChange
-                    var nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
-                    nativeInputValueSetter.call(input, value);
-                    
-                    var reactEvent = new Event('input', { bubbles: true });
-                    input.dispatchEvent(reactEvent);
-                }
-                
-                // 设置多重备用属性
-                input.setAttribute('data-value', value);
-                input.setAttribute('title', value);
-                input.setAttribute('aria-valuenow', value);
-                
-                // 防止组件重新渲染时清空
-                Object.defineProperty(input, 'value', {
-                    get: function() { return value; },
-                    set: function(newValue) { 
-                        if (newValue !== value && newValue !== '') {
-                            this.setAttribute('value', newValue);
-                        }
-                    }
-                });
-                
-                console.log('日期设置完成:', input.value);
-                return true;
-            """, start_element, "2025-07-30")
-
-
-            
 
 
             self.find_element(self.CATEGORY_LABEL).click()
