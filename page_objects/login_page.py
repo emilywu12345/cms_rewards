@@ -24,27 +24,17 @@ class LoginPage(BasePage):
             
             # 等待页面完全加载
             self._wait_for_page_ready()
-            
-            # 等待用户名输入框出现并输入
+
+            # 输入账号密码
             self._input_with_wait(self.USERNAME_INPUT, username, "用户名")
-            
-            # 等待密码输入框出现并输入
             self._input_with_wait(self.PASSWORD_INPUT, password, "密码")
             
             # 点击登录按钮
-            logger.info("点击登录按钮")
             self.click(self.LOGIN_BUTTON)
             
             # 等待登录结果 - Collect Gift按钮出现
-            if not self.wait_for_element(self.COLLECT_GIFT_BUTTON, timeout=timeout):
-                logger.error("登录失败: 未找到Collect Gift按钮")
-                self.take_screenshot("登录失败")
-                return False
-                
-            logger.info("登录成功")
-            self.take_screenshot("登录成功")
+            self.wait_for_element(self.COLLECT_GIFT_BUTTON, timeout=timeout)
             return True
-            
         except Exception as e:
             return self.handle_exception(e, "登录操作")
     
@@ -60,7 +50,7 @@ class LoginPage(BasePage):
             # 等待可能的loading遮罩消失 - 减少等待时间
             self.wait_loading_disappear(timeout=5)
             
-            # 等待用户名输入框可见 - 这是页面准备好的标志
+            # 等待用户名输入框可见
             WebDriverWait(self.driver, timeout).until(
                 EC.visibility_of_element_located(self.USERNAME_INPUT)
             )
@@ -82,5 +72,3 @@ class LoginPage(BasePage):
         except TimeoutException:
             logger.error(f"等待{field_name}输入框超时")
             raise
-
-

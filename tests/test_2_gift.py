@@ -1,6 +1,6 @@
 """
-礼物功能测试用例
-测试礼物的创建、编辑等功能
+Gift功能测试用例
+测试Gift的创建功能
 """
 
 import pytest
@@ -12,36 +12,36 @@ from data.gift_data import GIFT_TEST_DATA
 from utils.log_manager import logger
 
 
-@allure.epic("礼物管理")
-@allure.feature("礼物功能")
+@allure.epic("Gift管理")
+@allure.feature("Gift功能")
 class TestGift:
-    """礼物功能测试类"""
+    """Gift功能测试类"""
 
     def setup_method(self):
         """每个测试方法执行前的设置"""
-        logger.info("开始礼物功能测试")
+        logger.info("开始Gift功能测试")
 
     def teardown_method(self):
         """每个测试方法执行后的清理"""
-        logger.info("礼物功能测试完成")
+        logger.info("Gift功能测试完成")
 
-    @allure.story("添加礼物")
-    @allure.title("测试添加基础礼物功能")
-    @allure.description("测试用户是否能够成功填写礼物基本信息")
+    @allure.story("添加Gift")
+    @allure.title("测试添加基础Gift功能")
+    @allure.description("测试用户是否能够成功填写Gift基本信息")
     @allure.severity(allure.severity_level.CRITICAL)
-    def test_add_basic_gift(self, session_logged_in_driver):
-        """测试添加基础礼物"""
-        logger.info("开始测试添加基础礼物")
-        
-        # 初始化礼物页面对象
+    def test_add_gift(self, session_logged_in_driver):
+        """测试添加Gift"""
+        logger.info("开始测试添加Gift")
+
+        # 初始化Gift页面对象
         gift_page = GiftPage(session_logged_in_driver)
         
         # 获取测试数据
         gift_data = GIFT_TEST_DATA["auto_gift_1"]
-        
-        # 执行添加礼物操作
+
+        # 执行添加Gift操作
         result = gift_page.add_gift(gift_data)
         
         # 验证结果
-        assert result, "添加基础礼物失败"
-        logger.info("基础礼物添加测试通过")
+        assert result, "添加Gift失败"
+        logger.info("Gift添加测试通过")

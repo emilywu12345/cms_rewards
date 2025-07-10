@@ -17,12 +17,14 @@ class TestLogin:
     @pytest.fixture(autouse=True)
     def setup(self, request):
         """自动加载环境配置"""
-        self.env = request.config.getoption("--env")  # 从命令行获取环境
+
+        # 从命令行获取环境
+        self.env = request.config.getoption("--env")  
         self.env_config = ConfigManager.get_instance().get_env_config(self.env)
         assert self.env_config, f"无法加载 {self.env} 环境配置"
         assert self.env_config.get("username") and self.env_config.get("password"), "环境配置缺少账号或密码"
  
-    def test_0_login(self, driver):
+    def test_login_success(self, driver):
         """
         测试User使用有效账号密码能否成功登录系统
         
@@ -38,6 +40,5 @@ class TestLogin:
         password = self.env_config["password"]
 
         with allure.step(f"使用账号 {username} 登录系统"):
-            logger.info(f"开始登录测试: {username}")
             assert login_page.login(username, password), "登录失败"
             logger.info("登录测试完成，成功登录系统")
