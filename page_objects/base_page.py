@@ -276,4 +276,25 @@ class BasePage:
             return False
         except Exception as e:
             logger.error(f"上传图片时发生未知错误: {e}")
-            return False    
+            return False
+
+    def _wait_for_page_ready(self, timeout: int = 10):
+        """等待页面准备就绪"""
+        try:
+            # 等待DOM加载完成
+            WebDriverWait(self.driver, timeout).until(
+                lambda driver: driver.execute_script("return document.readyState") == "complete"
+            )
+            logger.info("页面DOM加载完成")
+            
+            # 等待可能的loading遮罩消失 - 减少等待时间
+            self.wait_loading_disappear(timeout=5)
+            
+            # 等待用户名输入框可见
+            WebDriverWait(self.driver, timeout).until(
+                EC.visibility_of_element_located(self.USERNAME_INPUT)
+            )
+            logger.info("登录页面准备就绪")
+                        
+        except TimeoutException:
+            logger.warning(f"等待页面准备超时({timeout}秒)，继续执行")

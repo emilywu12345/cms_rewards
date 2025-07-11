@@ -8,7 +8,7 @@ import allure
 import time
 from selenium.webdriver.common.by import By
 from page_objects.gift_page import GiftPage
-from data.gift_data import GIFT_TEST_DATA
+from data.test_data import GIFT_TEST_DATA
 from utils.log_manager import logger
 
 
