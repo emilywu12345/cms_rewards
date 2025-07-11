@@ -6,6 +6,8 @@ Gift测试数据
 GIFT_TEST_DATA = {
     "auto_gift_1": {
         "gift_create_url":"https://admincms-uat-cicd.splusrewards.com.hk/gift/create",
+        "thumbnail_file": "C:\\Users\\User\\File\\S+\\testImage\\Gift\\thumbnailImage.png",
+        "content_file": "C:\\Users\\User\\File\\S+\\testImage\\Gift\\contentImage.png",
         "remarks": "Auto Test Gift",
         "points": "100",
         "value": "20",

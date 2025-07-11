@@ -1,11 +1,12 @@
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, NoSuchElementException, WebDriverException
 from selenium.webdriver.common.by import By
 from utils.log_manager import logger
 from utils.config_manager import ConfigManager
 from datetime import datetime
 import time
+import os
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
@@ -48,13 +49,6 @@ class BasePage:
         """点击元素"""
         self.find_element(locator, timeout).click()
         
-    # def input_text(self, locator, text, clear=True, timeout=None):
-    #     """输入文本"""
-    #     element = self.find_element(locator, timeout)
-    #     if clear:
-    #         element.clear()
-    #     element.send_keys(text)
-
     def clear_input(self, locator, timeout=None):
         """仅清空输入框"""
         element = self.find_element(locator, timeout)
@@ -136,6 +130,8 @@ class BasePage:
         else:
             logger.error(f"{error_msg}: 发生未知异常 - {str(e)}")
             self.take_screenshot(f"{action_name}_发生未知异常")
+
+        self.take_screenshot(self.driver, f"{action_name}_异常截图")
         return False
 
     def set_form_value(self, value, date_icon_locator, picker_type):
@@ -166,6 +162,8 @@ class BasePage:
                 end_date_formatted_date = end_date_obj.strftime("%B %d, %Y").replace(' 0', ' ')
 
                 logger.info(f"设置 RangePicker 日期范围: {start_date_formatted_date} - {end_date_formatted_date}")
+            
+                # 当天日期按钮的 XPath，点击当天日期按钮
                 start_date_button = (By.XPATH, "//table[@class='ant-calendar-table']//td[contains(@title, '" + start_date_formatted_date + "')]")
                 end_date_button = (By.XPATH, "//table[@class='ant-calendar-table']//td[contains(@title, '" + end_date_formatted_date + "')]")
 
@@ -188,6 +186,8 @@ class BasePage:
                 date_formatted = date_obj.strftime("%B %d, %Y").replace(' 0', ' ')
 
                 logger.info(f"设置 DatePicker 日期: {date_formatted}")
+
+                # 当天日期按钮的 XPath，点击当天日期按钮
                 date_button = (By.XPATH, "//table[@class='ant-calendar-table']//td[contains(@title, '" + date_formatted + "')]")
 
                 logger.info(f"点击日期按钮: {date_button}")
@@ -199,33 +199,81 @@ class BasePage:
         
 
 
-    def move_to_element_and_scroll(self, element):
-        """移动到元素并滚动页面"""
+    def scroll_to_element(self, locator=None, element=None, timeout=15) -> bool:
+        """
+        滚动到指定元素使其可见
+        
+        Args:
+            locator: 元素定位器元组 (By.ID, "element_id")
+            element: 已找到的WebElement对象
+            timeout: 等待元素的超时时间
+        
+        Returns:
+            操作成功返回True，失败返回False
+        """
         try:
-            # 开始滚动到元素，等待元素可见
-            move_element = WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located(element)
-            )
-
-            # 滚动到元素
-            self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", move_element)
-            time.sleep(1)
+            # 根据传入参数选择元素获取方式
+            target_element = element
+            if locator and not element:
+                target_element = WebDriverWait(self.driver, timeout).until(
+                    EC.presence_of_element_located(locator)
+                )
             
-            # 移动鼠标到元素
-            actions = ActionChains(self.driver)
-            actions.move_to_element(move_element).perform()
-
-            # 等待元素可点击并点击
-            move_element = WebDriverWait(self.driver, 10).until(
-                EC.element_to_be_clickable(element)
+            if not target_element:
+                raise ValueError("必须提供locator或element参数之一")
+                
+            # 滚动到元素
+            self.driver.execute_script(
+                "arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", 
+                target_element
             )
-            move_element.click()
-
+            # 等待页面滚动完成
+            time.sleep(1)
+            return True
+            
+        except TimeoutException:
+            logger.error(f"等待元素超时: {locator}")
+            return False
+        except ValueError as e:
+            logger.error(str(e))
+            return False
         except Exception as e:
-            logger.warning(f"移动到元素并滚动失败: {e}")
-            # 尝试备用滚动方法
-            try:
-                self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight/2);")
-                logger.info("使用备用滚动方法")
-            except Exception as scroll_error:
-                logger.error(f"备用滚动方法也失败: {scroll_error}")
+            logger.error(f"滚动到元素时出错: {e}")
+            return False
+
+    def upload_thumbnail(self, file_path: str, element_id: str = "thumbnailImage") -> bool:
+        """
+        上传图片到指定元素
+        
+        Args:
+            file_path: 图片文件的完整路径
+            element_id: 上传元素的ID，默认为"thumbnailImage"
+        
+        Returns:
+            上传成功返回True，失败返回False
+        """
+        try:
+            # 检查文件是否存在
+            if not os.path.exists(file_path):
+                logger.error(f"文件不存在: {file_path}")
+                return False
+                
+            # 查找上传元素并发送文件路径
+            upload_element = self.driver.find_element(By.ID, element_id)
+            upload_element.send_keys(file_path)
+            
+            logger.info(f"成功上传图片: {os.path.basename(file_path)}")
+            return True
+            
+        except FileNotFoundError:
+            logger.error(f"文件未找到: {file_path}")
+            return False
+        except NoSuchElementException:
+            logger.error(f"找不到上传元素: ID={element_id}")
+            return False
+        except WebDriverException as e:
+            logger.error(f"WebDriver操作异常: {e}")
+            return False
+        except Exception as e:
+            logger.error(f"上传图片时发生未知错误: {e}")
+            return False    
