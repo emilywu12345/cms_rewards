@@ -2,14 +2,13 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, WebDriverException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
 from utils.log_manager import logger
 from utils.config_manager import ConfigManager
 from datetime import datetime
 import time
 import os
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.action_chains import ActionChains
 
 class BasePage:
     def __init__(self, driver):
@@ -49,16 +48,70 @@ class BasePage:
         """点击元素"""
         self.find_element(locator, timeout).click()
         
-    def clear_input(self, locator, timeout=None):
-        """仅清空输入框"""
-        element = self.find_element(locator, timeout)
-        element.clear()
-        time.sleep(0.2)  # 小延迟确保清空完成
+    # def clear_input(self, locator, timeout=None):
+    #     """仅清空输入框"""
+    #     element = self.find_element(locator, timeout)
+    #     element.clear()
+    #     time.sleep(0.2)  # 小延迟确保清空完成
 
-    def input_text(self, locator, text, timeout=None):
-        """仅输入文本"""
-        element = self.find_element(locator, timeout)
-        element.send_keys(text)
+    # def input_text(self, locator, text, timeout=None):
+    #     """仅输入文本"""
+    #     element = self.find_element(locator, timeout)
+    #     element.send_keys(text)
+
+
+    # 清空文本后输入文本
+    def clear_and_input_text(self, locator, text, timeout=10):
+        """清空输入框并输入文本 - 增强版，适用于Ant Design组件
+        Args:
+            locator: 元素定位器
+            text: 要输入的文本
+            timeout: 超时时间(秒)，默认10秒
+        """
+        try:
+            element = WebDriverWait(self.driver, timeout).until(EC.element_to_be_clickable(locator))
+            
+            # 方法1: 先点击元素获得焦点
+            element.click()
+            time.sleep(0.5)
+            
+            # 方法2: 多种清空方式组合使用
+            # 2.1 使用Ctrl+A全选然后删除
+            element.send_keys(Keys.CONTROL + "a")
+            time.sleep(0.3)
+            element.send_keys(Keys.DELETE)
+            time.sleep(0.3)
+            
+            # 2.2 使用clear()方法
+            element.clear()
+            time.sleep(0.5)
+            
+            # 2.3 如果还有内容，使用JavaScript强制清空
+            current_value = element.get_attribute('value')
+            if current_value:
+                logger.info(f"检测到残留文本: {current_value}，使用JavaScript清空")
+                self.driver.execute_script("arguments[0].value = '';", element)
+                # 触发input事件，确保React组件状态更新
+                self.driver.execute_script("arguments[0].dispatchEvent(new Event('input', { bubbles: true }));", element)
+                time.sleep(0.5)
+            
+            # 输入新文本
+            element.send_keys(text)
+            time.sleep(0.5)
+            
+            # 验证输入是否成功
+            final_value = element.get_attribute('value')
+            if final_value == text:
+                logger.info(f"输入文本成功: {text}")
+                return True
+            else:
+                logger.warning(f"输入验证失败，期望: {text}, 实际: {final_value}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"输入文本失败: {str(e)}")
+        return False
+
     def get_text(self, locator, timeout=None):
         """获取元素文本"""
         return self.find_element(locator, timeout).text
@@ -131,7 +184,6 @@ class BasePage:
             logger.error(f"{error_msg}: 发生未知异常 - {str(e)}")
             self.take_screenshot(f"{action_name}_发生未知异常")
 
-        self.take_screenshot(self.driver, f"{action_name}_异常截图")
         return False
 
     def set_form_value(self, value, date_icon_locator, picker_type):
@@ -148,28 +200,38 @@ class BasePage:
                 # 等待日期选择器激活
                 time.sleep(2)
 
-                # 後期優化 -----------
-                start_date = value[0]
-                end_date = value[1]  
+                # 產生當前日期的字串
+                now = datetime.now()
+                today_str = now.strftime("%B %d, %Y").replace(' 0', ' ')
 
-                # 解析为 datetime 对象（注意格式匹配）
-                start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
-                end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
+                # 如果選擇的範圍包含今天，則直接選擇今天的日期
+                if value[0] <= today_str <= value[1]:
+                    logger.info("選擇的日期範圍包含今天，直接選擇今天的日期")
+                    today_button = (By.XPATH, "//table[@class='ant-calendar-table']//td[contains(@title, '" + today_str + "')]")
+                    self.driver.find_element(*today_button).click()
+                else:
+                    # 後期優化 -----------
+                    start_date = value[0]
+                    end_date = value[1]  
+
+                    # 解析为 datetime 对象（注意格式匹配）
+                    start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
+                    end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
 
 
-                # 格式化为目标字符串 (Windows兼容格式)
-                start_date_formatted_date = start_date_obj.strftime("%B %d, %Y").replace(' 0', ' ')
-                end_date_formatted_date = end_date_obj.strftime("%B %d, %Y").replace(' 0', ' ')
+                    # 格式化为目标字符串 (Windows兼容格式)
+                    start_date_formatted_date = start_date_obj.strftime("%B %d, %Y").replace(' 0', ' ')
+                    end_date_formatted_date = end_date_obj.strftime("%B %d, %Y").replace(' 0', ' ')
 
-                logger.info(f"设置 RangePicker 日期范围: {start_date_formatted_date} - {end_date_formatted_date}")
-            
-                # 当天日期按钮的 XPath，点击当天日期按钮
-                start_date_button = (By.XPATH, "//table[@class='ant-calendar-table']//td[contains(@title, '" + start_date_formatted_date + "')]")
-                end_date_button = (By.XPATH, "//table[@class='ant-calendar-table']//td[contains(@title, '" + end_date_formatted_date + "')]")
+                    logger.info(f"设置 RangePicker 日期范围: {start_date_formatted_date} - {end_date_formatted_date}")
+                
+                    # 当天日期按钮的 XPath，点击当天日期按钮
+                    start_date_button = (By.XPATH, "//table[@class='ant-calendar-table']//td[contains(@title, '" + start_date_formatted_date + "')]")
+                    end_date_button = (By.XPATH, "//table[@class='ant-calendar-table']//td[contains(@title, '" + end_date_formatted_date + "')]")
 
-                logger.info(f"点击开始日期按钮: {start_date_button}, 结束日期按钮: {end_date_button}")
-                self.driver.find_element(*start_date_button).click()
-                self.driver.find_element(*end_date_button).click()
+                    logger.info(f"点击开始日期按钮: {start_date_button}, 结束日期按钮: {end_date_button}")
+                    self.driver.find_element(*start_date_button).click()
+                    self.driver.find_element(*end_date_button).click()
 
             elif picker_type == 'DatePicker':
                 logger.info("设置 DatePicker 日期: %s", value)
@@ -197,50 +259,86 @@ class BasePage:
             self.handle_exception(e, f"设置{picker_type}值")
             return False
         
-
-
-    def scroll_to_element(self, locator=None, element=None, timeout=15) -> bool:
+    def scroll_to_element(
+        self,
+        locator=None,
+        element=None,
+        timeout=15,
+        direction="down",  # 默认向下滚动
+        scroll_behavior="smooth",
+        offset=0,
+        block="center",
+        inline="start"
+    ) -> bool:
         """
         滚动到指定元素使其可见
         
         Args:
-            locator: 元素定位器元组 (By.ID, "element_id")
-            element: 已找到的WebElement对象
-            timeout: 等待元素的超时时间
+            locator: 元素定位器 (可选)
+            element: WebElement对象 (可选)
+            timeout: 查找元素超时时间(秒)
+            direction: 滚动方向，可选:
+                - 垂直: "down"(默认), "up"
+                - 水平: "left", "right"
+            scroll_behavior: 滚动行为 ("auto"或"smooth")
+            offset: 滚动后额外的偏移量(像素)
+            block: 垂直对齐方式 ("start", "center", "end", "nearest")
+            inline: 水平对齐方式 ("start", "center", "end", "nearest")
         
         Returns:
-            操作成功返回True，失败返回False
+            bool: 是否滚动成功
+            
+        Raises:
+            ValueError: 如果参数无效
         """
+        # 参数验证
+        if direction not in {"down", "up", "left", "right"}:
+            raise ValueError("direction必须是: down/up/left/right")
+        if scroll_behavior not in {"auto", "smooth"}:
+            raise ValueError("scroll_behavior必须是: auto或smooth")
+        
         try:
-            # 根据传入参数选择元素获取方式
+            # 获取目标元素
             target_element = element
             if locator and not element:
                 target_element = WebDriverWait(self.driver, timeout).until(
                     EC.presence_of_element_located(locator)
                 )
-            
+
             if not target_element:
-                raise ValueError("必须提供locator或element参数之一")
-                
-            # 滚动到元素
+                raise ValueError("未能找到目标元素")
+            
+            # 根据方向设置滚动参数
+            scroll_options = {
+                "behavior": scroll_behavior,
+                "block": "start" if direction == "down" else (
+                        "end" if direction == "up" else block),
+                "inline": "start" if direction == "right" else (
+                        "end" if direction == "left" else inline)
+            }
+            
+            # 执行滚动
             self.driver.execute_script(
-                "arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", 
-                target_element
+                "arguments[0].scrollIntoView(arguments[1]);",
+                target_element,
+                scroll_options
             )
-            # 等待页面滚动完成
-            time.sleep(1)
+            
+            # 应用偏移量
+            if offset != 0:
+                is_vertical = direction in ("down", "up")
+                offset_x = offset if not is_vertical else 0
+                offset_y = offset if is_vertical else 0
+                self.driver.execute_script(f"window.scrollBy({offset_x}, {offset_y});")
+                
             return True
             
-        except TimeoutException:
-            logger.error(f"等待元素超时: {locator}")
-            return False
-        except ValueError as e:
-            logger.error(str(e))
-            return False
         except Exception as e:
-            logger.error(f"滚动到元素时出错: {e}")
+            logger.error(f"滚动到元素失败: {str(e)}", exc_info=True)
             return False
+        
 
+   
     def upload_thumbnail(self, file_path: str, element_id: str = "thumbnailImage") -> bool:
         """
         上传图片到指定元素
@@ -298,3 +396,42 @@ class BasePage:
                         
         except TimeoutException:
             logger.warning(f"等待页面准备超时({timeout}秒)，继续执行")
+
+
+
+    @staticmethod
+    def get_timestamp_suffix(fmt: str = "compact") -> str:
+        """
+        获取当前时间戳后缀（支持多种预设格式）
+        
+        Args:
+            fmt: 格式类型，支持以下值：
+                - 'compact'       : 20230725143015 (默认)
+                - 'readable'      : 2023-07-25 14:30:15
+                - 'filename'     : 20230725_143015
+                - 'date'          : 20230725
+                - 'shortdate'     : 2023-07-25 (新增)
+                - 'time'         : 143015
+                - 或直接传入strftime格式字符串
+                
+        Returns:
+            格式化后的时间字符串
+            
+        Examples:
+            >>> get_timestamp_suffix()  # 20230725143015
+            >>> get_timestamp_suffix('readable')  # 2023-07-25 14:30:15
+            >>> get_timestamp_suffix('shortdate')  # 2023-07-25
+            >>> get_timestamp_suffix('%Y-%m')  # 2023-07
+        """
+        format_map = {
+            'compact': "%Y%m%d%H%M%S",
+            'readable': "%Y-%m-%d %H:%M:%S",
+            'filename': "%Y%m%d_%H%M%S",
+            'date': "%Y%m%d",
+            'shortdate': "%Y-%m-%d",  # 新增的短日期格式
+            'time': "%H%M%S"
+        }
+        
+        # 如果传入的是自定义格式字符串，直接使用
+        format_str = format_map.get(fmt, fmt)
+        return datetime.now().strftime(format_str)

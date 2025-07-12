@@ -9,6 +9,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 import pytest
+from page_objects.base_page import BasePage
+from data.test_data import GIFT_TEST_DATA, COPY_GIFT_TEST_DATA
 
 
 
@@ -87,10 +89,6 @@ class GiftPage(BasePage):
     # 选择的Location
     SELECTED_LOCATION = (By.XPATH, '//span[@title="BSX" and @class="ant-select-tree-node-content-wrapper ant-select-tree-node-content-wrapper-normal"]')
 
-    # # Location选择相关
-    # SELECTED_LOCATION = (By.XPATH, '//span[contains(@class, "ant-select-tree-title") and contains(text(), "Play to Win")]')
-    # SELECTED_LOCATION_ALT = (By.XPATH, '//span[contains(text(), "Booth") or contains(text(), "Promotion")]')
-    
     # Stock输入框
     STOCK = (By.XPATH, '//input[@id="stock"]')
     
@@ -115,16 +113,30 @@ class GiftPage(BasePage):
     SUBMIT_BUTTON = (By.XPATH, '//section[@id="main-layout"]//button[contains(@class, "ant-btn sino-btn") and @type="submit"]')
 
     # 已添加的Gift名称
-    ADDED_GIFT_NAME = (By.XPATH, '//tbody[@class="ant-table-tbody"]//td[contains(@class, "ant-table-column-has-actions")]//p[text()="Auto Test Gift"]')
+    gift_name = GIFT_TEST_DATA["add_auto_gift"]["gift_name_en"]
+    ADDED_GIFT_NAME = (By.XPATH, f'//tbody[@class="ant-table-tbody"]//td[contains(@class, "ant-table-column-has-actions")]//p[text()="{gift_name}"]')
+    logger.info(f"ADDED_GIFT_NAME定位器: {ADDED_GIFT_NAME}")
+
+
+    # Copy Gift元素
+    # Gift Name搜索框
+    GIFT_NAME_SEARCH = (By.XPATH, '//div[@class="ant-col ant-form-item-control-wrapper"]//input[@id="title"]')
+    # Search按钮
+    SEARCH_BUTTON = (By.XPATH, '//button[@type="submit"]')
+    # Copy按钮
+    COPY_BUTTON = (By.CSS_SELECTOR, "#main-layout > main > div > div > div > div.sc-kGXeez.dQAJzQ > div.isoInvoiceTable > div > div > div > div > div > div > table > tbody > tr > td:nth-child(15) > div > a:nth-child(3) > button")
+    # 已Copy的Gift名称
+    copy_gift_name = COPY_GIFT_TEST_DATA["copy_auto_gift"]["gift_name_en"]
+    COPIED_GIFT_NAME = (By.XPATH, f'//tbody[@class="ant-table-tbody"]//td[contains(@class, "ant-table-column-has-actions")]//p[text()="{copy_gift_name}"]')
+    logger.info(f"ADDED_GIFT_NAME定位器: {COPIED_GIFT_NAME}")
 
     @allure.step("创建Gift")
-    def add_gift(self, gift_info):
+    def add_gift(self, add_gift_info):
         """创建Gift"""
         try:
-
             # 导航到Gift创建页面
-            self.driver.get(gift_info.get("gift_create_url"))
-            logger.info(f"导航到Gift创建页面: {gift_info.get('gift_create_url')}")
+            self.driver.get(add_gift_info.get("gift_create_url"))
+            logger.info(f"导航到Gift创建页面: {add_gift_info.get('gift_create_url')}")
 
             # 等待页面加载完成
             logger.info("等待页面加载完成")
@@ -133,19 +145,19 @@ class GiftPage(BasePage):
 
             # # 上传缩略图
             logger.info("上传缩略图")
-            self.upload_thumbnail(gift_info.get("thumbnail_file"), "thumbnailImage")
+            self.upload_thumbnail(add_gift_info.get("thumbnail_file"), "thumbnailImage")
 
             # 上传内容图
             logger.info("上传内容图")
-            self.upload_thumbnail(gift_info.get("content_file"), "contentImage")
+            self.upload_thumbnail(add_gift_info.get("content_file"), "contentImage")
         
             # 输入remarks
             logger.info("输入remarks信息")
-            self.input_text(self.REMARKS, gift_info.get("remarks", "自动化测试备注"))
+            self.clear_and_input_text(self.REMARKS, add_gift_info.get("remarks", "自动化测试备注"))
             
             # 输入Points Required
             logger.info("输入Points Required信息")
-            self.input_text(self.POINTS_REQUIRED, str(gift_info.get("points", 100)))
+            self.clear_and_input_text(self.POINTS_REQUIRED, str(add_gift_info.get("points", 100)))
 
             # 选择Category为Hotel
             logger.info("选择Category为Hotel")
@@ -157,7 +169,8 @@ class GiftPage(BasePage):
 
             # 设置日期信息
             logger.info("开始设置日期信息,包括Showing Date, Redemption Date和Expiry Date")
-            current_date = datetime.now().strftime("%Y-%m-%d")
+            current_date = self.get_timestamp_suffix(fmt='shortdate')
+            logger.info(f"当前日期: {current_date}")
             self.set_form_value(value=[current_date, current_date], date_icon_locator=self.SHOWING_DATE_ICON, picker_type='RangePicker')
             self.set_form_value(value=[current_date, current_date], date_icon_locator=self.REDEMPTION_DATE_ICON, picker_type='RangePicker')
             self.set_form_value(value=[current_date], date_icon_locator=self.EXPIRY_DATE_ICON, picker_type='DatePicker')
@@ -167,7 +180,7 @@ class GiftPage(BasePage):
 
             # 勾选HIGHLIGHTED复选框
             logger.info("勾选HIGHLIGHTED复选框")
-            self.scroll_to_element(locator=self.HIGHLIGHTED)
+            self.scroll_to_element(locator=self.HIGHLIGHTED, direction='down', offset=100, timeout=10)
             # 尝试JavaScript点击HIGHLIGHTED
             self.driver.execute_script("document.querySelector('input#highlighted').click();")
             logger.info("JavaScript点击HIGHLIGHTED成功")
@@ -188,10 +201,8 @@ class GiftPage(BasePage):
             )
             purchase_option.click()
             time.sleep(1)
-            self.clear_input(self.VALUE)
-            self.input_text(self.VALUE, str(gift_info.get("value")))
-            self.clear_input(self.COST)
-            self.input_text(self.COST, str(gift_info.get("cost")))
+            self.clear_and_input_text(self.VALUE, str(add_gift_info.get("value")))
+            self.clear_and_input_text(self.COST, str(add_gift_info.get("cost")))
 
             # 输入gift name英文名称
             logger.info("输入gift name英文名称")
@@ -200,7 +211,7 @@ class GiftPage(BasePage):
             gift_name_en_element = WebDriverWait(self.driver, 10).until(
                 EC.element_to_be_clickable(self.GIFT_NAME_EN)
             )
-            gift_name_en_element.send_keys(gift_info.get("gift_name_en"))
+            gift_name_en_element.send_keys(add_gift_info.get("gift_name_en"))
 
             # 输入gift name繁体名称
             logger.info("输入gift name繁体名称")
@@ -209,7 +220,7 @@ class GiftPage(BasePage):
             gift_name_zh_hk_element = WebDriverWait(self.driver, 10).until(
                 EC.element_to_be_clickable(self.GIFT_NAME_ZH_HK)
             )
-            gift_name_zh_hk_element.send_keys(gift_info.get("gift_name_zh_hk"))
+            gift_name_zh_hk_element.send_keys(add_gift_info.get("gift_name_zh_hk"))
 
 
             # 输入gift name简体名称
@@ -219,7 +230,7 @@ class GiftPage(BasePage):
             gift_name_zh_cn_element = WebDriverWait(self.driver, 10).until(
                 EC.element_to_be_clickable(self.GIFT_NAME_ZH_CN)
             )
-            gift_name_zh_cn_element.send_keys(gift_info.get("gift_name_zh"))
+            gift_name_zh_cn_element.send_keys(add_gift_info.get("gift_name_zh"))
 
             # 点击Add按钮
             logger.info("点击Add按钮添加SKU")
@@ -232,11 +243,13 @@ class GiftPage(BasePage):
 
             # Add SKU表单
             # Mall下拉框
+            logger.info("选择Mall")
             self.find_element(self.MALL_OPTION).click()
             # Mall 选项值(Citywalk)
             self.find_element(self.SELECTED_MALL).click()
 
             # Shop下拉框
+            logger.info("选择Shop")
             self.find_element(self.SHOP_OPTION).click()
             # Shop 选项值(Citywalk)
             self.find_element(self.SELECTED_SHOP).click()
@@ -247,11 +260,13 @@ class GiftPage(BasePage):
             self.find_element(self.SHOP_OPTION).click()
 
             # 输入Stock
+            logger.info("输入Stock数量")
             self.find_element(self.STOCK).clear()
             # 输入Stock数量
-            self.input_text(self.STOCK, str(gift_info.get("stock")))
+            self.clear_and_input_text(self.STOCK, str(add_gift_info.get("stock")))
 
             # Tag下拉框EN
+            logger.info("选择Tag下拉框EN")
             self.find_element(self.TAG_EN).click()
             # Tag 选项值(Citywalk)
             self.find_element(self.TAG_EN_ACTIVE).click()
@@ -269,6 +284,7 @@ class GiftPage(BasePage):
             self.find_element(self.TAG_ZH_HK_ACTIVE).click()
     
             # 提交SKU表单信息
+            logger.info("提交SKU表单信息")
             sku_submit_button = WebDriverWait(self.driver, 10).until(
                 EC.element_to_be_clickable(self.SKU_SUBMIT_BUTTON)
             )
@@ -276,7 +292,76 @@ class GiftPage(BasePage):
             time.sleep(3)
 
             # Maximum Number of SKU to redeem
-            self.MAXIMUM_NUMBER_OF_SKU = self.find_element(self.MAXIMUM_NUMBER_OF_SKU).send_keys(gift_info.get("sku_number"))
+            self.MAXIMUM_NUMBER_OF_SKU = self.find_element(self.MAXIMUM_NUMBER_OF_SKU).send_keys(add_gift_info.get("sku_number"))
+
+            # # 提交Gift表单信息
+            logger.info("提交Gift表单信息")
+            submit_button = WebDriverWait(self.driver, 10).until(
+                EC.element_to_be_clickable(self.SUBMIT_BUTTON)
+            )   
+            time.sleep(3)
+            submit_button.click()
+
+            # 验证是否成功创建Gift
+            logger.info("验证是否成功创建Gift") 
+            WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located(self.ADDED_GIFT_NAME))
+            time.sleep(3)
+            logger.info("成功提交Gift信息")
+            return True
+        except Exception as e:
+            logger.error(f"创建gift失败: {e}")
+            return self.handle_exception(e, "创建gift")
+        
+
+    @allure.step("创建Gift")
+    def copy_gift(self, copy_gift_info, add_gift_info):
+        """复制Gift"""
+        try:
+
+            # 导航到Gift创建页面
+            self.driver.get(copy_gift_info.get("gift_copy_url"))
+            logger.info(f"导航到Gift列表页面: {copy_gift_info.get('gift_copy_url')}")
+
+            # 等待页面加载完成
+            logger.info("等待页面加载完成")
+            self.wait_for_element((By.TAG_NAME, "form"), timeout=10)
+            time.sleep(2)
+
+            # 输入gift name
+            logger.info("输入gift name")
+            self.find_element(self.GIFT_NAME_SEARCH).send_keys(add_gift_info.get("gift_name_en"))
+            # 点击Search按钮
+            logger.info("点击Search按钮")
+            self.find_element(self.SEARCH_BUTTON).click()
+            time.sleep(2)
+            # 水平滚动到Copy按钮
+            logger.info("水平滚动到Copy按钮可见")
+            self.scroll_to_element(locator=self.COPY_BUTTON, direction='right', offset=100, timeout=10)
+            # 点击Copy按钮
+            time
+            logger.info("点击Copy按钮")
+            copy_button = WebDriverWait(self.driver, 10).until(
+                EC.element_to_be_clickable(self.COPY_BUTTON)
+            )
+            time.sleep(2)
+            copy_button.click()
+            time.sleep(2)
+
+            # 输入gift name英文名称
+            logger.info("输入gift name英文名称")
+            self.scroll_to_element(locator=self.GIFT_NAME_EN, direction='down', offset=100, timeout=10)
+            # 等待gift name英文输入框可点击
+            self.clear_and_input_text(self.GIFT_NAME_EN, copy_gift_info.get("gift_name_en"))
+            # 输入gift name繁体名称
+            logger.info("输入gift name繁体名称")
+            self.scroll_to_element(locator=self.GIFT_NAME_ZH_HK, direction='down', offset=100, timeout=10)
+            # 等待gift name繁体中文输入框可点击
+            self.clear_and_input_text(self.GIFT_NAME_ZH_HK, copy_gift_info.get("gift_name_zh_hk"))
+            # 输入gift name简体名称
+            logger.info("输入gift name简体名称")
+            self.scroll_to_element(locator=self.GIFT_NAME_ZH_CN, direction='down', offset=100, timeout=10)
+            # 等待gift name简体中文输入框可点击
+            self.clear_and_input_text(self.GIFT_NAME_ZH_CN, copy_gift_info.get("gift_name_zh"))
 
             # 提交Gift表单信息
             submit_button = WebDriverWait(self.driver, 10).until(
@@ -284,11 +369,16 @@ class GiftPage(BasePage):
             )   
             time.sleep(3)
             submit_button.click()
+
+            # 验证是否成功复制Gift
+            logger.info("验证是否成功复制Gift")
+            self.wait_for_element(self.COPIED_GIFT_NAME, timeout=10)
+            time.sleep(3)
             logger.info("成功提交Gift信息")
             return True
         except Exception as e:
-            logger.error(f"创建gift失败: {e}")
-            return self.handle_exception(e, "创建gift")
+            logger.error(f"Copy gift失败: {e}")
+            return self.handle_exception(e, "Copy gift")
 
 
 if __name__ == '__main__':

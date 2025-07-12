@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 
-# Gift测试数据
+# Add Gift测试数据
 GIFT_TEST_DATA = {
-    "auto_gift_1": {
+    "add_auto_gift": {
         "gift_create_url":"https://admincms-uat-cicd.splusrewards.com.hk/gift/create",
         "thumbnail_file": "C:\\Users\\User\\File\\S+\\testImage\\Gift\\thumbnailImage.png",
         "content_file": "C:\\Users\\User\\File\\S+\\testImage\\Gift\\contentImage.png",
@@ -19,3 +19,12 @@ GIFT_TEST_DATA = {
     }
 }
 
+# Copy Gift测试数据
+COPY_GIFT_TEST_DATA = {
+    "copy_auto_gift": {
+        "gift_copy_url":"https://admincms-uat-cicd.splusrewards.com.hk/gift",
+        "gift_name_en": "Copy Auto Test Gift",
+        "gift_name_zh": "复制自动测试礼物",
+        "gift_name_zh_hk": "复制自動測試禮物"
+    }
+}
